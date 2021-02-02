@@ -15,10 +15,10 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 class Grib:
-    """ 
-    Grib class is an abstract class that should be implement for providing grib data to routers
-    """
+	""" 
+	Grib class is an abstract class that should be implement for providing grib data to routers
+	"""
 
 	def getWindAt(self, t, lat, lon):
-        """ Returns (twd, tws) for the given point (lat, lon) at time t """
-        raise (Exception('Not implemented'))
+		""" Returns (twd, tws) for the given point (lat, lon) at time t """
+		raise (Exception('Not implemented'))

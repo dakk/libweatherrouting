@@ -31,16 +31,16 @@ class Routing:
 	"""
 	"""
 
-	def __init__ (self, algorithm, polar, track, grib, startDatetime, pointValidity, startPosition = None):
+	def __init__ (self, algorithm, polar, track, grib, pointValidity, startDatetime, startPosition = None):
 		"""
-        Parameters
-        ----------
-        algorithm : Router
-            The routing algorithm class
-        polar : Polar
-            Polar object of the boat we want to route
-        track : list
-            A list of track points (lat, lon)
+		Parameters
+		----------
+		algorithm : Router
+			The routing algorithm class
+		polar : Polar
+			Polar object of the boat we want to route
+		track : list
+			A list of track points (lat, lon)
 		grib : Grib
 			Grib object that abstract our wind / wave / wathever queries
 		startDateTime : datetime
@@ -49,7 +49,7 @@ class Routing:
 			A functions that receives lat and lon and returns True if the point is valid (ie: in the sea)
 		startPosition : (float, float)
 			A pair containing initial position (or None if we want to start from the first track point)
-        """
+		"""
 
 		self.end = False
 		self.algorithm = algorithm(polar, grib, pointValidity)

@@ -22,7 +22,7 @@ EARTH_RADIUS=60.0*360/(2*math.pi)#nm
 
 
 def cfbinomiale(n,i):
-    return math.factorial(n)/(math.factorial(n-i)*math.factorial(i))
+	return math.factorial(n)/(math.factorial(n-i)*math.factorial(i))
 
 def ortodromic2 (lat1, lon1, lat2, lon2):
 	p1 = math.radians (lat1)
