@@ -15,7 +15,6 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import math
-import time
 
 from .. import utils
 
@@ -46,7 +45,7 @@ class RoutingNoWindException(Exception):
 	pass
 
 class RoutingResult:
-	def __init__(self, time=0, path=[], isochrones=[], position=None, progress=0):
+	def __init__(self, time, path=[], isochrones=[], position=None, progress=0):
 		self.time = time
 		self.path = path
 		self.isochrones = isochrones
@@ -128,9 +127,8 @@ class Router:
 		return isocrone
 
 
-	# Calculate the Velocity-Made-Good of a boat sailing from
-	# start to end at current speed / angle
 	def calculateVMG (self, speed, angle, start, end):
+		""" Calculates the Velocity-Made-Good of a boat sailing from start to end at current speed / angle """
 		return speed * math.cos (angle)
 
 
