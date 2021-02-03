@@ -134,4 +134,4 @@ class Router:
 
 
 	def route (self, lastlog, t, start, end):
-		return RoutingResult()
+		raise (Exception("Not implemented"))
