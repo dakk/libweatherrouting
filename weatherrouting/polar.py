@@ -18,13 +18,23 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import math
 
 class Polar:
-	def __init__ (self, polarpath):
+	def __init__ (self, polarPath, f = None):
+		"""
+		Parameters
+		----------
+		polarPath : string
+			Path of the polar file
+		f : File
+			File object for passing an opened file
+		"""
+
 		self.tws = []
 		self.twa = []
 		self.vmgdict = {}
 		self.speedTable = []
 		
-		f = open (polarpath, "r")
+		if f == None:
+			f = open (polarPath, "r")
 		
 		tws = f.readline ().split ()
 		for i in range (1,len(tws)):
@@ -45,6 +55,8 @@ class Polar:
 
 
 	def getSpeed (self, tws, twa):
+		""" Returns the speed (in knots) given tws and twa """
+		
 		tws1 = 0
 		tws2 = 0
 		for k in range(0, len(self.tws)):
