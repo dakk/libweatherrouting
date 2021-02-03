@@ -20,7 +20,6 @@ import math
 
 EARTH_RADIUS=60.0*360/(2*math.pi)#nm
 
-
 def cfbinomiale(n,i):
 	return math.factorial(n)/(math.factorial(n-i)*math.factorial(i))
 
@@ -46,15 +45,34 @@ def lossodromic (latA,lonA,latB,lonB):
 
 	return (p1.distance (p2, ellipse = 'sphere'), math.radians (p1.heading_initial(p2)))
 
-def pointDistance (latA, lonA, latB, lonB):
+
+def km2nm(d):
+	return d * 0.539957
+
+def nm2km(d):
+	return d / 0.539957
+
+def pointDistance (latA, lonA, latB, lonB, unit='nm'):
+	""" Returns the distance between two geo points """
 	p1 = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
 	p2 = LatLon23.LatLon(LatLon23.Latitude(latB), LatLon23.Longitude(lonB))
-	return p1.distance (p2)
+	d = p1.distance (p2)
+
+	if unit == 'nm':
+		return km2nm(d)
+	elif unit == 'km':
+		return d
 	
 
-def routagePointDistance (latA,lonA,Distanza,Rotta):
+def routagePointDistance (latA, lonA, distance, hdg, unit='nm'):
+	""" Returns the point from (latA, lonA) to the given (distance, hdg) """
+	if unit == 'nm':
+		d = nm2km(distance)
+	elif unit == 'km':
+		d = distance
+
 	p = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
-	of = p.offset (math.degrees (Rotta), Distanza).to_string('D')
+	of = p.offset (math.degrees (heading), d).to_string('D')
 	return (float (of[0]), float (of[1]))
 
 
