@@ -72,7 +72,7 @@ def routagePointDistance (latA, lonA, distance, hdg, unit='nm'):
 		d = distance
 
 	p = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
-	of = p.offset (math.degrees (heading), d).to_string('D')
+	of = p.offset (math.degrees (hdg), d).to_string('D')
 	return (float (of[0]), float (of[1]))
 
 
