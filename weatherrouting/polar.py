@@ -55,7 +55,7 @@ class Polar:
 
 
 	def getSpeed (self, tws, twa):
-		""" Returns the speed (in knots) given tws and twa """
+		""" Returns the speed (in knots) given tws (in knots) and twa (in radians) """
 		
 		tws1 = 0
 		tws2 = 0
