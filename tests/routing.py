@@ -27,7 +27,6 @@ class mockGrib:
         return self.starttwd + self.starttwd*(random.random()*self.fuzziness -self.fuzziness/2)
 
     def getWindAt(self, t, lat, lon):
-        print( math.radians(self.twd_var(t)), self.tws_var(t), )
         return ( math.radians(self.twd_var(t)), self.tws_var(t), )
 
 def mock_point_validity(y,x):
@@ -35,7 +34,7 @@ def mock_point_validity(y,x):
 
 polar_obj = weatherrouting.Polar(os.path.join(os.path.dirname(__file__),'Bavaria38.pol'))
 
-track = [(5,38),(6,39)]
+track = [(5,38),(5.2,38.2)]
 
 class TestRouting(unittest.TestCase):
 
@@ -51,8 +50,15 @@ class TestRouting(unittest.TestCase):
         )
         
     def test_step(self):
-        res = self.routing_obj.step()
-        print ("isocrones",res.isochrones)
-        print("path",res.path)
-        print("position",res.position)
+        res = None 
+        i = 0
+
+        while not self.routing_obj.end:
+            res = self.routing_obj.step()
+            # print ("isocrones",res.isochrones)
+            # print("path",res.path)
+            # print("position",res.position)
+            i += 1
+        
+        self.assertEqual(i, 4)
         self.assertEqual(not res.path, False)
