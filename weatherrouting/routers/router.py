@@ -15,6 +15,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import math
+import inspect
 
 from .. import utils
 
@@ -55,10 +56,15 @@ class RoutingResult:
 class Router:
 	PARAMS = {}
 
-	def __init__ (self, polar, grib, pointValidity):
+	def __init__ (self, polar, grib, validity_func):
 		self.polar = polar
 		self.grib = grib
-		self.pointValidity = pointValidity
+		if len(inspect.signature(validity_func).parameters) == 2:
+			self.pointValidity = validity_func
+			self.lineValidity = None
+		elif len(inspect.signature(validity_func).parameters) == 4:
+			self.pointValidity = None
+			self.lineValidity = validity_func
 
 	def setParamValue(self, code, value):
 		self.PARAMS[code] = value
@@ -90,8 +96,12 @@ class Router:
 				
 				if utils.pointDistance (ptoiso[0], ptoiso[1], nextwp[0], nextwp[1]) >= utils.pointDistance (p[0], p[1], nextwp[0], nextwp[1]):
 				 	continue
-				if not self.pointValidity (ptoiso[0], ptoiso[1]):
-					continue
+				if self.pointValidity:
+					if not self.pointValidity (ptoiso[0], ptoiso[1]):
+						continue
+				else:
+					if not self.lineValidity (ptoiso[0], ptoiso[1], p[0], p[1]):
+						continue
 				
 				newisopoints.append ((ptoiso[0], ptoiso[1], i, t, twd, tws, speed, math.degrees(brg)))
 
