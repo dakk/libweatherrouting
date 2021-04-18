@@ -32,7 +32,11 @@ class LinearBestIsoRouter (Router):
 		position = start
 		path = []
 		for p in isoc[-1]:
-			if utils.pointDistance (end[0],end[1], p[0], p[1]) < self.getParamValue('minIncrease'):
+			(twd,tws) = self.grib.getWindAt (time + datetime.timedelta(hours=1), p[0], p[1])
+			maxReachDistance = self.polar.maxReachDistance(p, twd, tws)
+			if utils.pointDistance (end[0],end[1], p[0], p[1]) < maxReachDistance*1.1:
+				if self.lineValidity and not self.lineValidity(end[0],end[1], p[0], p[1]):
+					continue
 				path.append (p)
 				for iso in isoc[::-1][1::]:
 					path.append (iso[path[-1][2]])
