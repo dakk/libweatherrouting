@@ -67,15 +67,15 @@ class TestRouting(unittest.TestCase):
             res = self.routing_obj.step()
             i += 1
 
-        self.assertEqual(i, 4)
+        self.assertEqual(i, 8)
         self.assertEqual(not res.path, False)
 
 
 class checkRoute(unittest.TestCase):
 
     def setUp(self):
-        grib = mock_grib(4,225,0) 
-        self.track = track = [(5,38),(5.4,38.4)]
+        grib = mock_grib(2,45,0.1) 
+        self.track = [(5,38),(5.4,38.4)]
         island_route = mock_point_validity(self.track, factor=4)
         self.routing_obj = weatherrouting.Routing(
             LinearBestIsoRouter,
@@ -92,10 +92,9 @@ class checkRoute(unittest.TestCase):
 
         while not self.routing_obj.end:
             res = self.routing_obj.step()
-            print("step",i, res.progress)
             i += 1
         
         path_to_end = res.path + [[*self.track[-1],'']]
-        print (weatherrouting.utils.pathAsGeojson(path_to_end))
 
         self.assertEqual(not res.path, False)
+        
