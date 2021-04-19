@@ -151,4 +151,4 @@ def pathAsGeojson(path):
 		"features": feats
 	}
 
-	return json.dumps(gj)
+	return gj
