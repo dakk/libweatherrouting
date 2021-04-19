@@ -32,17 +32,19 @@ class LinearBestIsoRouter (Router):
 		position = start
 		path = []
 		for p in isoc[-1]:
-			(twd,tws) = self.grib.getWindAt (time + datetime.timedelta(hours=1), p[0], p[1])
-			maxReachDistance = self.polar.maxReachDistance(p, twd, tws)
-			if utils.pointDistance (end[0],end[1], p[0], p[1]) < maxReachDistance*1.1:
-				if self.lineValidity and not self.lineValidity(end[0],end[1], p[0], p[1]):
-					continue
-				path.append (p)
-				for iso in isoc[::-1][1::]:
-					path.append (iso[path[-1][2]])
+			distance_to_end_point = utils.pointDistance (end[0],end[1], p[0], p[1])
+			if distance_to_end_point < self.getParamValue('minIncrease'):
+				(twd,tws) = self.grib.getWindAt (time + datetime.timedelta(hours=1), p[0], p[1])
+				maxReachDistance, maxspeed = self.polar.maxReachDistance(p, twd, tws)
+				if utils.pointDistance (end[0],end[1], p[0], p[1]) < maxReachDistance*1.1:
+					print ("LinearBestIsoRouter",utils.pointDistance (end[0],end[1], p[0], p[1]), time + datetime.timedelta(hours=1),maxspeed, maxReachDistance, twd, tws)
+					if self.pointValidity or self.lineValidity(end[0],end[1], p[0], p[1]):
+						path.append (p)
+						for iso in isoc[::-1][1::]:
+							path.append (iso[path[-1][2]])
 
-				path = path[::-1]
-				position = path[-1]
-				break
+						path = path[::-1]
+						position = path[-1]
+						break
 
 		return RoutingResult(time=time + datetime.timedelta(hours=1), path=path, position=position, isochrones=isoc)
