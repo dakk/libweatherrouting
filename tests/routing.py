@@ -41,6 +41,12 @@ class mock_point_validity:
         else:
             return True
 
+    def line_validity(self, y1, x1, y2, x2):
+        if weatherrouting.utils.pointDistance(x1,y2,*(self.mean_point)) < self.mean_island:
+            return False
+        else:
+            return True
+
 polar_obj = weatherrouting.Polar(os.path.join(os.path.dirname(__file__),'Bavaria38.pol'))
 
 
@@ -82,7 +88,7 @@ class checkRoute(unittest.TestCase):
             polar_obj,
             self.track,
             grib,
-            island_route.point_validity,
+            island_route.line_validity,
             datetime.datetime.fromisoformat('2021-04-02T12:00:00')
         )
         
