@@ -80,6 +80,7 @@ class Routing:
 		
 		if self.wp >= len (self.track):
 			self.end = True
+			res = self.log[-1]
 			return self.log[-1]
 
 		# Next waypoint
