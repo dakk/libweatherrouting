@@ -56,15 +56,11 @@ class RoutingResult:
 class Router:
 	PARAMS = {}
 
-	def __init__ (self, polar, grib, validity_func):
+	def __init__ (self, polar, grib, pointValidity = None, lineValidity = None):
 		self.polar = polar
 		self.grib = grib
-		if len(inspect.signature(validity_func).parameters) == 2:
-			self.pointValidity = validity_func
-			self.lineValidity = None
-		elif len(inspect.signature(validity_func).parameters) == 4:
-			self.pointValidity = None
-			self.lineValidity = validity_func
+		self.pointValidity = pointValidity
+		self.lineValidity = lineValidity
 
 	def setParamValue(self, code, value):
 		self.PARAMS[code] = value

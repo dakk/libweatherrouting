@@ -61,8 +61,8 @@ class TestRouting(unittest.TestCase):
             polar_obj,
             track,
             grib,
-            island_route.point_validity,
-            datetime.datetime.fromisoformat('2021-04-02T12:00:00')
+            datetime.datetime.fromisoformat('2021-04-02T12:00:00'),
+            pointValidity = island_route.point_validity,
         )
         
     def test_step(self):
@@ -88,8 +88,8 @@ class checkRoute(unittest.TestCase):
             polar_obj,
             self.track,
             grib,
-            island_route.line_validity,
-            datetime.datetime.fromisoformat('2021-04-02T12:00:00')
+            datetime.datetime.fromisoformat('2021-04-02T12:00:00'),
+            lineValidity = island_route.line_validity,
         )
         
     def test_step(self):

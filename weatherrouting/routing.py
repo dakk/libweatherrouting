@@ -31,7 +31,7 @@ class Routing:
 	"""
 	"""
 
-	def __init__ (self, algorithm, polar, track, grib, pointValidity, startDatetime, startPosition = None):
+	def __init__ (self, algorithm, polar, track, grib, startDatetime, startPosition = None, pointValidity = None, lineValidity = None):
 		"""
 		Parameters
 		----------
@@ -45,14 +45,19 @@ class Routing:
 			Grib object that abstract our wind / wave / wathever queries
 		startDateTime : datetime
 			Start time
-		pointValidity : function
-			A functions that receives lat and lon and returns True if the point is valid (ie: in the sea)
 		startPosition : (float, float)
+			Optional, default to None
 			A pair containing initial position (or None if we want to start from the first track point)
+		pointValidity : function(lat, lon)
+			Optional, default to None
+			A functions that receives lat and lon and returns True if the point is valid (ie: in the sea)
+		lineValidity : function(lat1, lon1, lat2, lon2)
+			Optional, default to None
+			A functions that receives a vector defined by lat1, lon1, lat2, lon2 and returns True if the line is valid (ie: completely in the sea)
 		"""
 
 		self.end = False
-		self.algorithm = algorithm(polar, grib, pointValidity)
+		self.algorithm = algorithm(polar, grib, pointValidity, lineValidity)
 		self.track = track
 		self.steps = 0
 		self.path = []
