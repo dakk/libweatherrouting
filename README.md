@@ -18,12 +18,12 @@ Read the LICENSE file.
 
 For a comprehensive usage reference example pleace refer to [wind_forecast_routing QGIS plugin](https://github.com/enricofer/wind_forecast_routing/blob/master/wind_forecast_routing_algorithm.py) or [GWeatherRouting standalone application](https://github.com/dakk/gweatherrouting)
 
-Almost one external function has to be implemented As preliminary requirement for library usage:
+Almost one external function has to be implemented as a preliminary requirement for library usage:
 
 ### Wind direction and speed for a given location at specified time
-a function that accept a datetime instant, a float latitude and float longitude as parameters, 
-performs a wind forecast analysis for the specified time and location ( usually sampling a grib file )
-and returns a tuple with true wind direction (twd) expressed in radians and true wind speed (tws) expressed in meters per second
+A function that accept a datetime item, a float latitude and float longitude as parameters, 
+performs a wind forecast analysis for the specified time and location (usually sampling a grib file)
+and returns a tuple with true wind direction (`twd`) expressed in radians and true wind speed (`tws`) expressed in meters per second
 
 ```
 def getWindAt( t, lat, lon)
@@ -32,9 +32,9 @@ def getWindAt( t, lat, lon)
     return (twd, tws)
 ```
 
-### Point validity ( Optional )
-a function that accept a float latitude and float longitude as parameters, 
-performs a test to check if the specified location is eligible as waypoint ( i.e. lay or not on sea )
+### Point validity (Optional)
+A function that accept a float latitude and float longitude as parameters, 
+performs a test to check if the specified location is eligible as waypoint (i.e. lay or not on sea)
 and returns a boolean (True if valid, False if invalid)
 
 ```
@@ -44,9 +44,9 @@ def point_validity(lat, lon)
     return True/False
 ```
 
-### Line validity ( Optional )
-a function that accept a vector defined as four float parameters (latitude1, longitude1, latitude2, longitude2)
-performs a test to check if the specified line between two waypoints is valid ( i.e. completely lay or not on sea, or in other words is in line of sight )
+### Line validity (Optional)
+A function that accept a vector defined as four float parameters (latitude1, longitude1, latitude2, longitude2)
+performs a test to check whether the specified line between two waypoints is valid (i.e. lays completely or not on sea, or in other words is in line of sight)
 and returns a boolean (True if valid, False if invalid)
 
 ```
@@ -72,14 +72,14 @@ track = ((5.1, 38.1), (5.2, 38.4), (5.7, 38.2))
 ```
 
 ### Define a polar wrapper
-Define the polar object from a [polar file]( https://www.seapilot.com/features/polars/ ) describing the performance of the boat at different wind speeds (tws) and different angles (twd)
+Define the polar object from a [polar file]( https://www.seapilot.com/features/polars/ ) describing the performance of the boat at different wind speeds (`tws`) and different angles (`twd`)
 
 ```
 polar_obj = Polar("polar_files/bavaria38.pol")
 ```
 
 ### Define the start datetime
-Define the polar object from a [polar file]( https://www.seapilot.com/features/polars/ ) describing the performance of the boat at different wind speeds (tws) and different angles (twd)
+Define the polar object from a [polar file]( https://www.seapilot.com/features/polars/ ) describing the performance of the boat at different wind speeds (`tws`) and different angles (`twd~)
 
 ```
 start = datetime.fromisoformat('2021-04-02T12:00:00')
@@ -122,7 +122,7 @@ res.path         # the list of route waypoints
 ```
 
 ### Export path as geojson
-the path could be exported as a geojson object for cartographic representation
+The path could be exported as a geojson object for cartographic representation
 ```
 from weatherrouting.utils import pathAsGeojson
 import json
