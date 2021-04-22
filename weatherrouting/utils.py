@@ -17,6 +17,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import LatLon23
 import math
+import json
 
 EARTH_RADIUS=60.0*360/(2*math.pi)#nm
 
@@ -99,4 +100,55 @@ def reduce180 (alfa):
 		return 0.0
 	return alfa
 
-	
+def pathAsGeojson(path):
+	tr = []
+	for wp in path:
+		if len(wp) == 3:
+			tr.append((wp[0], wp[1], str(wp[2]), 0, 0, 0, 0))
+		else:
+			tr.append((wp[0], wp[1], str(wp[4]), wp[5], wp[6], wp[7], wp[8]))
+
+	feats = []
+	route = []
+
+	for order,wayp in enumerate(tr):
+		feat = {
+			"type": "Feature",
+			"id": order,
+			"geometry": {
+				"type": "Point",
+				"coordinates": [
+					wayp[0],
+					wayp[1]
+				]
+			},
+			"properties": {
+				"timestamp": str(wayp[2]),
+				"attr1": wayp[3],
+				"attr2": wayp[4],
+				"attr3": wayp[5],
+				"attr4": wayp[6]
+			}
+		}
+		feats.append(feat)
+		route.append([wayp[0], wayp[1]])
+
+	feats.append({
+		"type": "Feature",
+		"id": order+1,
+		"geometry": {
+			"type": "LineString",
+			"coordinates": route
+		},
+		"properties": {
+			"start-timestamp": str(tr[0][2]),
+			"end-timestamp": str(tr[-1][2])
+		}
+	})
+
+	gj = {
+		"type": "FeatureCollection",
+		"features": feats
+	}
+
+	return gj

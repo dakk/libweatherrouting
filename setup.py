@@ -25,5 +25,6 @@ setup(name='weatherrouting',
 	setup_requires='setuptools',
 	author_email=['gessadavide@gmail.com', 'riccardo.apolloni@gmail.com'],
 	packages=['weatherrouting', 'weatherrouting.routers'],
-	install_requires=open ('requirements.txt', 'r').read ().split ('\n')
+	install_requires=open ('requirements.txt', 'r').read ().split ('\n'),
+	test_suite = 'tests',
 )
