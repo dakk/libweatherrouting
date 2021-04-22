@@ -3,12 +3,17 @@
 [![Build Status](https://travis-ci.com/dakk/libweatherrouting.svg?branch=master)](https://travis-ci.com/dakk/libweatherrouting.svg?branch=master)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-A 100% python weather routing library for sailing
-
+A 100% python weather routing library for sailing. 
 
 ## License
 
 Read the LICENSE file.
+
+## Credits
+
+This work is partially based and inspired by Riccardo Apolloni
+[Virtual Sailing Simulator](https://web.archive.org/web/20180324153950/https://riccardoapolloni.altervista.org/).
+
 
 ## Install
 
