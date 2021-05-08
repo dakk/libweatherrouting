@@ -28,7 +28,7 @@ Almost one external function has to be implemented as a preliminary requirement 
 ### Wind direction and speed for a given location at specified time
 A function that accept a datetime item, a float latitude and float longitude as parameters, 
 performs a wind forecast analysis for the specified time and location (usually sampling a grib file)
-and returns a tuple with true wind direction (`twd`) expressed in radians and true wind speed (`tws`) expressed in meters per second
+and returns a tuple with true wind direction (`twd`) expressed in radians and true wind speed (`tws`) expressed in meters per second or `None` if running out of temporal/geographic grib scope.
 
 ```
 def getWindAt( t, lat, lon)
@@ -70,7 +70,7 @@ from datetime import datetime
 ```
 
 ### Define a track points list
-Define a list of trackpoints as lat,long tuples (almost 2) that have to be reached by route
+Define a list of trackpoints as lat,long tuples (almost 2) that have to be reached by the route
 
 ```
 track = ((5.1, 38.1), (5.2, 38.4), (5.7, 38.2))
@@ -117,9 +117,7 @@ the step method returns a RoutingResult object with the following informations d
 ```
 res.time         # the datetime of step  
 res.isochrones   # all points reached at a specified datetime
-res.progress     # the calculation progress
-res.path         # when the end track point is reached contains the route path
-res.position    
+res.progress     # the calculation progress 
 ```
 and after the end of the routing calculation contains a list of tuple containing the waypoints informations (lat,lon,datetime, twd, tws, speed, heading)
 ```
