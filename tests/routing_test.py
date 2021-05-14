@@ -27,10 +27,11 @@ import datetime
 from weatherrouting.routers.linearbestisorouter import LinearBestIsoRouter
 
 class mock_grib:
-    def __init__(self,starttws,starttwd, fuzziness ):
+    def __init__(self,starttws,starttwd, fuzziness, out_of_scope = None ):
         self.starttws = starttws
         self.starttwd = starttwd
         self.fuzziness = fuzziness
+        self.out_of_scope = out_of_scope
         self.seedSource = datetime.datetime.fromisoformat('2000-01-01T00:00:00')
         
     def tws_var(self,t=None):
@@ -46,7 +47,10 @@ class mock_grib:
         return self.starttwd + self.starttwd*(random.random()*self.fuzziness -self.fuzziness/2)
 
     def getWindAt(self, t, lat, lon):
-        return ( math.radians(self.twd_var(t)), self.tws_var(t), )
+        if not self.out_of_scope or t < self.out_of_scope:
+            return ( math.radians(self.twd_var(t)), self.tws_var(t), )
+        else:
+            return None
 
 class mock_point_validity:
 
@@ -177,5 +181,31 @@ class checkRoute_highWind_mockIsland_3(unittest.TestCase):
             i += 1
         
         self.assertEqual(i, 6)
+        self.assertEqual(not res.path, False)
+
+class checkRoute_out_of_scope(unittest.TestCase):
+
+    def setUp(self):
+        grib = mock_grib(10,270,0.5,out_of_scope=datetime.datetime.fromisoformat('2021-04-02T15:00:00')) 
+        self.track = [(5,38),(5.5,38.5)]
+        island_route = mock_point_validity(self.track, factor=3)
+        self.routing_obj = weatherrouting.Routing(
+            LinearBestIsoRouter,
+            polar_obj,
+            self.track,
+            grib,
+            datetime.datetime.fromisoformat('2021-04-02T12:00:00'),
+            lineValidity = island_route.line_validity,
+        )
+        
+    def test_step(self):
+        res = None 
+        i = 0
+
+        while not self.routing_obj.end:
+            res = self.routing_obj.step()
+            i += 1
+        
+        self.assertEqual(i, 4)
         self.assertEqual(not res.path, False)
         
