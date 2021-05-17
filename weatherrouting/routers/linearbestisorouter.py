@@ -45,6 +45,8 @@ class LinearBestIsoRouter (Router):
 				isoc = self.calculateIsochrones (time + datetime.timedelta(hours=1), lastlog.isochrones, end)
 			else:
 				isoc = self.calculateIsochrones (time + datetime.timedelta(hours=1), [[(start[0], start[1], time)]], end)
+			nearest_dist = self.getParamValue('minIncrease')
+			nearest_solution = None
 			for p in isoc[-1]:
 				distance_to_end_point = utils.pointDistance (end[0],end[1], p[0], p[1])
 				if distance_to_end_point < self.getParamValue('minIncrease'):
@@ -52,8 +54,11 @@ class LinearBestIsoRouter (Router):
 					maxReachDistance = self.polar.maxReachDistance(p, twd, tws)
 					if utils.pointDistance (end[0],end[1], p[0], p[1]) < abs(maxReachDistance*1.1):
 						if (not self.pointValidity or self.pointValidity(end[0],end[1])) and (not self.lineValidity or self.lineValidity(end[0],end[1], p[0], p[1])):
-							generate_path(p)
-							break
+							if distance_to_end_point < nearest_dist:
+								nearest_dist = distance_to_end_point
+								nearest_solution = p
+			if nearest_solution:
+				generate_path(nearest_solution)
 						
 		else: #out of grib scope
 			minDist = 1000000
