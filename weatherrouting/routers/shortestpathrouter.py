@@ -18,12 +18,14 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import datetime
 from .. import utils
-from .router import *
+from .linearbestisorouter import *
 
-class LinearBestIsoRouter (Router):
+class ShortestPathRouter (LinearBestIsoRouter):
 	PARAMS = {
-		'minIncrease': RouterParam('minIncrease', 'Minimum increase (nm)', 'float', 'Set the minimum value for selecting a new valid point', default=10.0, lower=1.0, upper=100.0, step=0.1, digits=1)
+		'minIncrease': RouterParam('minIncrease', 'Minimum increase (nm)', 'float', 'Set the minimum value for selecting a new valid point', default=10.0, lower=1.0, upper=100.0, step=0.1, digits=1),
+		'fixedSpeed': RouterParam('fixedSpeed', 'Fixed speed (kn)', 'float', 'Set the fixed speed', default=5.0, lower=1.0, upper=60.0, step=0.1, digits=1)
 	}
+
 
 	def route (self, lastlog, time, start, end):
 		position = start
@@ -41,16 +43,16 @@ class LinearBestIsoRouter (Router):
 		
 		if self.grib.getWindAt (time + datetime.timedelta(hours=1), end[0],end[1]):
 			if lastlog != None and len (lastlog.isochrones) > 0:
-				isoc = self.calculateIsochrones (time + datetime.timedelta(hours=1), lastlog.isochrones, end)
+				isoc = self.calculateShortestPathIsochrones (self.getParamValue('fixedSpeed'), time + datetime.timedelta(hours=1), lastlog.isochrones, end)
 			else:
-				isoc = self.calculateIsochrones (time + datetime.timedelta(hours=1), [[(start[0], start[1], time)]], end)
+				isoc = self.calculateShortestPathIsochrones (self.getParamValue('fixedSpeed'), time + datetime.timedelta(hours=1), [[(start[0], start[1], time)]], end)
 			nearest_dist = self.getParamValue('minIncrease')
 			nearest_solution = None
 			for p in isoc[-1]:
 				distance_to_end_point = utils.pointDistance (end[0],end[1], p[0], p[1])
 				if distance_to_end_point < self.getParamValue('minIncrease'):
 					(twd,tws) = self.grib.getWindAt (time + datetime.timedelta(hours=1), p[0], p[1])
-					maxReachDistance = self.polar.maxReachDistance(p, twd, tws, p[6])
+					maxReachDistance = (1. / 60. * 60.) * p[6]
 					if utils.pointDistance (end[0],end[1], p[0], p[1]) < abs(maxReachDistance*1.1):
 						if (not self.pointValidity or self.pointValidity(end[0],end[1])) and (not self.lineValidity or self.lineValidity(end[0],end[1], p[0], p[1])):
 							if distance_to_end_point < nearest_dist:

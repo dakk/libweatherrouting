@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2017-2021 Davide Gessa
+# Copyright (C) 2021 Enrico Ferreguti
 # Copyright (C) 2012 Riccardo Apolloni
 '''
 This program is free software: you can redistribute it and/or modify
@@ -19,7 +20,8 @@ import LatLon23
 import math
 import json
 
-EARTH_RADIUS=60.0*360/(2*math.pi)#nm
+EARTH_RADIUS = 60.0 * 360 / (2 * math.pi) # nm
+NAUTICAL_MILE_IN_KM = 1.852
 
 def cfbinomiale(n,i):
 	return math.factorial(n)/(math.factorial(n-i)*math.factorial(i))
