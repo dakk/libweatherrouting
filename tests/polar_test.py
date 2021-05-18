@@ -40,5 +40,5 @@ class TestPolar(unittest.TestCase):
 
     def test_max_dist_reaching(self):
         p1 = (5,38)
-        maxd = self.polar_obj.maxReachDistance(p1,90,3)
-        self.assertEqual(maxd, 6.886599679723727, 0.001)
+        maxd = self.polar_obj.maxReachDistance(p1,5)
+        self.assertEqual(maxd, 5.000000000000199, 0.001)

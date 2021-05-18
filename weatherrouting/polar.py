@@ -171,9 +171,6 @@ class Polar:
 		return twa
 
 		
-	def maxReachDistance(self, p, twd, tws, speed = None):
-		dt = (1. / 60. * 60.)
-		if speed == None:
-			speed = self.getRoutageSpeed (tws, math.copysign (twd,1)) * utils.NAUTICAL_MILE_IN_KM
+	def maxReachDistance(self, p, speed, dt=(1. / 60. * 60.)):
 		maxp = utils.routagePointDistance (p[0], p[1], speed * dt, 1)
 		return utils.pointDistance(p[0], p[1], maxp[0], maxp[1])

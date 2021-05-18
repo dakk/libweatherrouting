@@ -21,6 +21,7 @@ import datetime
 import os
 import json
 import datetime
+import hashlib
 
 from weatherrouting.routers.linearbestisorouter import LinearBestIsoRouter
 from .mock_grib import mock_grib
@@ -55,7 +56,10 @@ class TestRouting_lowWind_noIsland(unittest.TestCase):
 
         path_to_end = res.path + [[*self.track[-1],'']]
         self.assertEqual( res.time, datetime.datetime.fromisoformat('2021-04-02 19:00:00'))
-        self.assertEqual(len(json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))), 2843)
+
+        gjs = json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))
+        self.assertEqual(len(gjs), 2843)
+        self.assertEqual(hashlib.sha256(gjs.encode()).hexdigest(), 'd11127f9228c704c47ccfdcac2cc1b8e97ecae5e6212637aa5e1ccc49c6e396a')
 
 
 class TestRouting_lowWind_mockIsland_5(unittest.TestCase):
