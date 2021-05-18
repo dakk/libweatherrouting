@@ -26,49 +26,5 @@ class ShortestPathRouter (LinearBestIsoRouter):
 		'fixedSpeed': RouterParam('fixedSpeed', 'Fixed speed (kn)', 'float', 'Set the fixed speed', default=5.0, lower=1.0, upper=60.0, step=0.1, digits=1)
 	}
 
-
 	def route (self, lastlog, time, start, end):
-		position = start
-		path = []
-
-		def generate_path(p):
-			nonlocal path
-			nonlocal isoc
-			nonlocal position
-			path.append (p)
-			for iso in isoc[::-1][1::]:
-				path.append (iso[path[-1][2]])
-			path = path[::-1]
-			position = path[-1]
-		
-		if self.grib.getWindAt (time + datetime.timedelta(hours=1), end[0],end[1]):
-			if lastlog != None and len (lastlog.isochrones) > 0:
-				isoc = self.calculateShortestPathIsochrones (self.getParamValue('fixedSpeed'), time + datetime.timedelta(hours=1), lastlog.isochrones, end)
-			else:
-				isoc = self.calculateShortestPathIsochrones (self.getParamValue('fixedSpeed'), time + datetime.timedelta(hours=1), [[(start[0], start[1], time)]], end)
-			nearest_dist = self.getParamValue('minIncrease')
-			nearest_solution = None
-			for p in isoc[-1]:
-				distance_to_end_point = utils.pointDistance (end[0],end[1], p[0], p[1])
-				if distance_to_end_point < self.getParamValue('minIncrease'):
-					(twd,tws) = self.grib.getWindAt (time + datetime.timedelta(hours=1), p[0], p[1])
-					maxReachDistance = (1. / 60. * 60.) * p[6]
-					if utils.pointDistance (end[0],end[1], p[0], p[1]) < abs(maxReachDistance*1.1):
-						if (not self.pointValidity or self.pointValidity(end[0],end[1])) and (not self.lineValidity or self.lineValidity(end[0],end[1], p[0], p[1])):
-							if distance_to_end_point < nearest_dist:
-								nearest_dist = distance_to_end_point
-								nearest_solution = p
-			if nearest_solution:
-				generate_path(nearest_solution)
-						
-		else: #out of grib scope
-			minDist = 1000000
-			isoc = lastlog.isochrones
-			for p in isoc[-1]:
-				checkDist = utils.pointDistance (end[0],end[1], p[0], p[1]) 
-				if checkDist < minDist:
-					minDist = checkDist
-					minP = p
-			generate_path(minP)
-
-		return RoutingResult(time=time + datetime.timedelta(hours=1), path=path, position=position, isochrones=isoc)
+		return self._route(lastlog, time, start, end, lambda time, isoc, end: self.calculateShortestPathIsochrones (self.getParamValue('fixedSpeed'), time, isoc, end))

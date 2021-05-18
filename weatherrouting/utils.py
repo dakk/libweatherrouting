@@ -79,6 +79,11 @@ def routagePointDistance (latA, lonA, distance, hdg, unit='nm'):
 	return (float (of[0]), float (of[1]))
 
 
+def maxReachDistance(p, speed, dt=(1. / 60. * 60.)):
+	maxp = routagePointDistance (p[0], p[1], speed * dt, 1)
+	return pointDistance(p[0], p[1], maxp[0], maxp[1])
+
+
 def reduce360 (alfa):
 	if math.isnan (alfa):
 		return 0.0
