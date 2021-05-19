@@ -19,7 +19,8 @@ import unittest
 
 from utils import *
 from polar import *
-from routing import *
+from shortestpathrouter import *
+from linearbestisorouter import *
 
 if __name__ == '__main__':
     unittest.main()

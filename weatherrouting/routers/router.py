@@ -30,6 +30,7 @@ from .. import utils
 
 # [[level1], [level2,level2], [level3,level3,level3,level3]]
 
+
 class RouterParam:
 	def __init__(self, code, name, ttype, tooltip, default, lower=None, upper=None, step=None, digits=None):
 		self.code = code
@@ -70,7 +71,28 @@ class Router:
 	def getParamValue(self, code):
 		return self.PARAMS[code].value
 
+	def calculateShortestPathIsochrones (self, fixedSpeed, t, isocrone, nextwp):
+		""" Calculates isochrones based on shortest path at fixed speed (motoring);
+			the speed considers reductions / increases derived from leeway """
+		def pointF(p, tws, twa, dt, brg):
+			# TODO: add current factor
+			speed = fixedSpeed
+			return utils.routagePointDistance (p[0], p[1], speed * dt * utils.NAUTICAL_MILE_IN_KM, brg), speed
+
+		return self._calculateIsochrones(t, isocrone, nextwp, pointF)
+		
+
 	def calculateIsochrones (self, t, isocrone, nextwp):
+		""" Calculate isochrones depending on routageSpeed from polar """
+		def pointF(p, tws, twa, dt, brg):
+			speed = self.polar.getRoutageSpeed (tws, math.copysign (twa,1))
+			return utils.routagePointDistance (p[0], p[1], speed * dt * utils.NAUTICAL_MILE_IN_KM, brg), speed
+
+		return self._calculateIsochrones(t, isocrone, nextwp, pointF)
+
+
+	def _calculateIsochrones (self, t, isocrone, nextwp, pointF):
+		""" Calcuates isochrones based on pointF next point calculation """
 		dt = (1. / 60. * 60.)
 		last = isocrone [-1]
 
@@ -83,14 +105,14 @@ class Router:
 			try:
 				(twd,tws) = self.grib.getWindAt (t, p[0], p[1])
 			except:
-				raise(RoutingNoWindException())
+				raise (RoutingNoWindException())
 
 			for twa in range(-180,180,5):
 				twa = math.radians(twa)
 				brg = utils.reduce360(twd+twa)
 
-				speed = self.polar.getRoutageSpeed (tws, math.copysign (twa,1))
-				ptoiso = utils.routagePointDistance (p[0], p[1], speed*dt*1.85, brg)
+				# Calculate next point
+				ptoiso, speed = pointF(p, tws, twa, dt, brg)
 				
 				if utils.pointDistance (ptoiso[0], ptoiso[1], nextwp[0], nextwp[1]) >= utils.pointDistance (p[0], p[1], nextwp[0], nextwp[1]):
 				 	continue

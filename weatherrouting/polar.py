@@ -171,8 +171,3 @@ class Polar:
 		return twa
 
 		
-	def maxReachDistance(self,p,twd,tws):
-		dt = (1. / 60. * 60.)
-		speed = self.getRoutageSpeed (tws, math.copysign (twd,1))
-		maxp = utils.routagePointDistance (p[0], p[1], speed*dt*1.85, 1)
-		return utils.pointDistance(p[0], p[1], maxp[0], maxp[1])

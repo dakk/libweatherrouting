@@ -21,3 +21,8 @@ import weatherrouting
 class TestUtils(unittest.TestCase):
     def test_pointDistance(self):
         self.assertEqual(round(weatherrouting.utils.pointDistance(0.0, 0.0, 1/60, 0.0)), 1)
+
+    def test_max_dist_reaching(self):
+        p1 = (5,38)
+        maxd = weatherrouting.utils.maxReachDistance(p1,5)
+        self.assertEqual(maxd, 5.000000000000199, 0.001)
