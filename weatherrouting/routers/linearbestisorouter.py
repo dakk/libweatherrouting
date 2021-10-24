@@ -60,8 +60,9 @@ class LinearBestIsoRouter (Router):
 								nearest_solution = p
 			if nearest_solution:
 				generate_path(nearest_solution)
-						
-		else: #out of grib scope
+
+		# out of grib scope
+		else: 
 			minDist = 1000000
 			isoc = lastlog.isochrones
 			for p in isoc[-1]:

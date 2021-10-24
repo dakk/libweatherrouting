@@ -22,7 +22,7 @@ import math
 
 class TestPolar(unittest.TestCase):
     def setUp(self):
-        self.polar_obj = weatherrouting.Polar(os.path.join(os.path.dirname(__file__),'Bavaria38.pol'))
+        self.polar_obj = weatherrouting.Polar(os.path.join(os.path.dirname(__file__),'data/bavaria38.pol'))
 
     def test_getSpeed(self):
         self.assertEqual(self.polar_obj.getSpeed(8,math.radians(60)),6.1, 0.001)

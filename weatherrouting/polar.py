@@ -44,12 +44,12 @@ class Polar:
 
 		line = f.readline ()
 		while line != "":
-			dato = line.split ()
-			twa = float (dato[0])
+			data = line.split ()
+			twa = float (data[0])
 			self.twa.append (math.radians (twa))
 			speedline = []
-			for i in range (1,len (dato)):
-				speed = float (dato[i])
+			for i in range (1,len (data)):
+				speed = float (data[i])
 				speedline.append (speed)
 			self.speedTable.append (speedline)
 			line = f.readline ()
@@ -67,7 +67,7 @@ class Polar:
 		for k in range(len(self.tws) - 1, 0, -1):
 			if tws <= self.tws[k]:
 				tws2 = k
-		if tws1 > tws2:#caso di tws oltre i valori in tabella
+		if tws1 > tws2: # TWS over table limits
 			tws2 = len(self.tws) - 1
 		twa1 = 0
 		twa2 = 0

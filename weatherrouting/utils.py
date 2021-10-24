@@ -124,9 +124,9 @@ def pathAsGeojson(path):
 			"id": order,
 			"geometry": {
 				"type": "Point",
-				"coordinates": [
-					wayp[0],
-					wayp[1]
+				"coordinates": [ # longitude, latitude
+					wayp[1],
+					wayp[0]
 				]
 			},
 			"properties": {
@@ -138,7 +138,7 @@ def pathAsGeojson(path):
 			}
 		}
 		feats.append(feat)
-		route.append([wayp[0], wayp[1]])
+		route.append([wayp[1], wayp[0]]) # longitude, latitude
 
 	feats.append({
 		"type": "Feature",

@@ -109,13 +109,14 @@ class Router:
 
 			for twa in range(-180,180,5):
 				twa = math.radians(twa)
-				brg = utils.reduce360(twd+twa)
+				brg = utils.reduce360(twd + twa)
 
 				# Calculate next point
 				ptoiso, speed = pointF(p, tws, twa, dt, brg)
 				
 				if utils.pointDistance (ptoiso[0], ptoiso[1], nextwp[0], nextwp[1]) >= utils.pointDistance (p[0], p[1], nextwp[0], nextwp[1]):
 				 	continue
+				
 				if self.pointValidity:
 					if not self.pointValidity (ptoiso[0], ptoiso[1]):
 						continue

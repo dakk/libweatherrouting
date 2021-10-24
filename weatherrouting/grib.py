@@ -21,7 +21,7 @@ class Grib:
 
 	def getWindAt(self, t, lat, lon):
 		""" 
-		Returns (twd, tws) for the given point (lat, lon) at time t 
+		Returns (twd: radians, tws: knots) for the given point (lat, lon) at time t 
 		or None if running out of temporal/geographic grib scope
 		"""
 		raise (Exception('Not implemented'))
