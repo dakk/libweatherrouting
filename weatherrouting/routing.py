@@ -14,7 +14,6 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-import math
 from .routers import linearbestisorouter, RoutingResult
 
 def listRoutingAlgorithms():
@@ -73,7 +72,7 @@ class Routing:
 			self.position = self.track[0]
 
 
-	def step (self):
+	def step (self) -> RoutingResult:
 		""" Execute a single routing step """
 
 		self.steps += 1

@@ -18,15 +18,14 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import LatLon23
 import math
-import json
 
 EARTH_RADIUS = 60.0 * 360 / (2 * math.pi) # nm
 NAUTICAL_MILE_IN_KM = 1.852
 
-def cfbinomiale(n,i):
+def cfbinomiale(n: float, i: float) -> float:
 	return math.factorial(n)/(math.factorial(n-i)*math.factorial(i))
 
-def ortodromic2 (lat1, lon1, lat2, lon2):
+def ortodromic2 (lat1: float, lon1: float, lat2: float, lon2: float) -> tuple[float, float]:
 	p1 = math.radians (lat1)
 	p2 = math.radians (lat2)
 	dp = math.radians (lat2-lat1)
@@ -36,26 +35,26 @@ def ortodromic2 (lat1, lon1, lat2, lon2):
 	c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
 	return (EARTH_RADIUS * c, a)
 
-def ortodromic (latA,lonA,latB,lonB):
+def ortodromic (latA: float, lonA: float, latB: float, lonB: float) -> tuple[float, float]:
 	p1 = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
 	p2 = LatLon23.LatLon(LatLon23.Latitude(latB), LatLon23.Longitude(lonB))
 
 	return (p1.distance (p2), math.radians (p1.heading_initial(p2)))
 
-def lossodromic (latA,lonA,latB,lonB):
+def lossodromic (latA: float, lonA: float, latB: float, lonB: float) -> tuple[float, float]:
 	p1 = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
 	p2 = LatLon23.LatLon(LatLon23.Latitude(latB), LatLon23.Longitude(lonB))
 
 	return (p1.distance (p2, ellipse = 'sphere'), math.radians (p1.heading_initial(p2)))
 
 
-def km2nm(d):
+def km2nm(d: float) -> float:
 	return d * 0.539957
 
-def nm2km(d):
+def nm2km(d: float) -> float:
 	return d / 0.539957
 
-def pointDistance (latA, lonA, latB, lonB, unit='nm'):
+def pointDistance (latA: float, lonA: float, latB: float, lonB: float, unit: str = 'nm') -> float:
 	""" Returns the distance between two geo points """
 	p1 = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
 	p2 = LatLon23.LatLon(LatLon23.Latitude(latB), LatLon23.Longitude(lonB))
@@ -67,7 +66,7 @@ def pointDistance (latA, lonA, latB, lonB, unit='nm'):
 		return d
 	
 
-def routagePointDistance (latA, lonA, distance, hdg, unit='nm'):
+def routagePointDistance (latA: float, lonA: float, distance: float, hdg: float, unit: str='nm') -> tuple[float, float]:
 	""" Returns the point from (latA, lonA) to the given (distance, hdg) """
 	if unit == 'nm':
 		d = nm2km(distance)
@@ -79,12 +78,12 @@ def routagePointDistance (latA, lonA, distance, hdg, unit='nm'):
 	return (float (of[0]), float (of[1]))
 
 
-def maxReachDistance(p, speed, dt=(1. / 60. * 60.)):
+def maxReachDistance(p, speed: float, dt: float = (1. / 60. * 60.)) -> float:
 	maxp = routagePointDistance (p[0], p[1], speed * dt, 1)
 	return pointDistance(p[0], p[1], maxp[0], maxp[1])
 
 
-def reduce360 (alfa):
+def reduce360 (alfa: float) -> float:
 	if math.isnan (alfa):
 		return 0.0
 		
@@ -98,7 +97,7 @@ def reduce360 (alfa):
 		return 0.0
 	return alfa
 
-def reduce180 (alfa):
+def reduce180 (alfa: float) -> float:
 	if alfa>math.pi:
 		alfa=alfa-2*math.pi
 	if alfa<-math.pi:
@@ -107,7 +106,7 @@ def reduce180 (alfa):
 		return 0.0
 	return alfa
 
-def pathAsGeojson(path):
+def pathAsGeojson(path: str):
 	tr = []
 	for wp in path:
 		if len(wp) == 3:

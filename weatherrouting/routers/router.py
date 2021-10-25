@@ -159,10 +159,10 @@ class Router:
 		return isocrone
 
 
-	def calculateVMG (self, speed, angle, start, end):
+	def calculateVMG (self, speed, angle, start, end) -> float:
 		""" Calculates the Velocity-Made-Good of a boat sailing from start to end at current speed / angle """
 		return speed * math.cos (angle)
 
 
-	def route (self, lastlog, t, start, end):
+	def route (self, lastlog, t, start, end) -> RoutingResult:
 		raise (Exception("Not implemented"))
