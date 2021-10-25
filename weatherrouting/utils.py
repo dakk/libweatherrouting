@@ -17,6 +17,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import LatLon23
+from typing import Tuple 
 import math
 
 EARTH_RADIUS = 60.0 * 360 / (2 * math.pi) # nm
@@ -25,7 +26,7 @@ NAUTICAL_MILE_IN_KM = 1.852
 def cfbinomiale(n: float, i: float) -> float:
 	return math.factorial(n)/(math.factorial(n-i)*math.factorial(i))
 
-def ortodromic2 (lat1: float, lon1: float, lat2: float, lon2: float) -> tuple[float, float]:
+def ortodromic2 (lat1: float, lon1: float, lat2: float, lon2: float) -> Tuple[float, float]:
 	p1 = math.radians (lat1)
 	p2 = math.radians (lat2)
 	dp = math.radians (lat2-lat1)
@@ -35,13 +36,13 @@ def ortodromic2 (lat1: float, lon1: float, lat2: float, lon2: float) -> tuple[fl
 	c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
 	return (EARTH_RADIUS * c, a)
 
-def ortodromic (latA: float, lonA: float, latB: float, lonB: float) -> tuple[float, float]:
+def ortodromic (latA: float, lonA: float, latB: float, lonB: float) -> Tuple[float, float]:
 	p1 = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
 	p2 = LatLon23.LatLon(LatLon23.Latitude(latB), LatLon23.Longitude(lonB))
 
 	return (p1.distance (p2), math.radians (p1.heading_initial(p2)))
 
-def lossodromic (latA: float, lonA: float, latB: float, lonB: float) -> tuple[float, float]:
+def lossodromic (latA: float, lonA: float, latB: float, lonB: float) -> Tuple[float, float]:
 	p1 = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
 	p2 = LatLon23.LatLon(LatLon23.Latitude(latB), LatLon23.Longitude(lonB))
 
@@ -66,7 +67,7 @@ def pointDistance (latA: float, lonA: float, latB: float, lonB: float, unit: str
 		return d
 	
 
-def routagePointDistance (latA: float, lonA: float, distance: float, hdg: float, unit: str='nm') -> tuple[float, float]:
+def routagePointDistance (latA: float, lonA: float, distance: float, hdg: float, unit: str='nm') -> Tuple[float, float]:
 	""" Returns the point from (latA, lonA) to the given (distance, hdg) """
 	if unit == 'nm':
 		d = nm2km(distance)

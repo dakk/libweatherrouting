@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
+from typing import Tuple 
 from io import FileIO
 import math
 
@@ -96,7 +96,7 @@ class Polar:
 		return speed
 		
 
-	def getReaching(self, tws: float) -> tuple[float, float]:
+	def getReaching(self, tws: float) -> Tuple[float, float]:
 		maxspeed = 0
 		twamaxspeed = 0
 		for twa in range(0,181):
@@ -108,7 +108,7 @@ class Polar:
 		return (maxspeed, twamaxspeed)
 
 
-	def getMaxVMGTWA(self, tws: float, twa: float) -> tuple[float, float]:
+	def getMaxVMGTWA(self, tws: float, twa: float) -> Tuple[float, float]:
 		if not ((tws, twa) in self.vmgdict):
 			twamin = max(0, twa-math.pi/2)
 			twamax = min(math.pi, twa+math.pi/2)
@@ -125,12 +125,12 @@ class Polar:
 		return self.vmgdict[(tws, twa)]
 
 
-	def getMaxVMGUp(self, tws: float) -> tuple[float, float]:
+	def getMaxVMGUp(self, tws: float) -> Tuple[float, float]:
 		vmguptupla = self.getMaxVMGTWA(tws, 0)
 		return (vmguptupla[0], vmguptupla[1])
 
 
-	def getMaxVMGDown(self, tws: float) -> tuple[float, float]:
+	def getMaxVMGDown(self, tws: float) -> Tuple[float, float]:
 		vmgdowntupla = self.getMaxVMGTWA(tws, math.pi)
 		return (-vmgdowntupla[0], vmgdowntupla[1])
 
