@@ -20,10 +20,10 @@ from setuptools import setup
 
 setup(name='weatherrouting',
 	version=0.1,
-	description='',
+	description='Weather routing library for sailing',
 	author=['Davide Gessa', 'Riccardo Apolloni'],
 	setup_requires='setuptools',
-	author_email=['gessadavide@gmail.com', 'riccardo.apolloni@gmail.com'],
+	author_email='gessadavide@gmail.com',
 	packages=['weatherrouting', 'weatherrouting.routers'],
 	install_requires=open ('requirements.txt', 'r').read ().split ('\n'),
 	test_suite = 'tests',
