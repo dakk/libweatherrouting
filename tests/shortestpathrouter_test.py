@@ -54,7 +54,7 @@ class TestRouting_noIsland(unittest.TestCase):
 
         path_to_end = res.path + [[*self.track[-1],'']]
         self.assertEqual( res.time, datetime.datetime.fromisoformat('2021-04-02 14:00:00'))
-        self.assertEqual(len(json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))), 1196)
+        self.assertEqual(len(json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))), 1193)
 
 
 class TestRouting_mockIsland_5(unittest.TestCase):
