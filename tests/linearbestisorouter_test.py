@@ -30,63 +30,49 @@ from .mock_point_validity import mock_point_validity
 polar_bavaria38 = weatherrouting.Polar(os.path.join(os.path.dirname(__file__),'data/bavaria38.pol'))
 
 
-class TestRouting_gait_downwind(unittest.TestCase):
-    def setUp(self):
-        grib = mock_grib(20,90,0)
-        self.track = [(35.80502,25.27515),(35.81287, 24.73033)]
-        island_route = mock_point_validity(self.track)
-        self.routing_obj = weatherrouting.Routing(
-            LinearBestIsoRouter,
-            polar_bavaria38,
-            self.track,
-            grib,
-            datetime.datetime.fromisoformat('2021-04-02T12:00:00'),
-            pointValidity = island_route.point_validity,
-        )
-        
+def heading(y,x):
+    a = math.degrees(math.atan2(y,x))
+    if a<0:
+        a = 360 + a
+    return (90 - a + 360) % 360
+
+
+class TestRouting_straigth_upwind(unittest.TestCase):
+ 
     def test_step(self):
-        res = None 
-        i = 0
+
+        base_step = [[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]]
+        base_start = [34,17]
+        base_gjs = ""
+
+        for s in base_step:
+            base_end = [base_start[0]+s[0],base_start[1]+s[1]]
+            head = heading(*s)
+            print ("TEST UPWIND TWD",head,"step",s)
+            pvmodel = mock_point_validity([base_start,base_end])
+            routing_obj = weatherrouting.Routing(
+                LinearBestIsoRouter,
+                polar_bavaria38,
+                [base_start,base_end],
+                mock_grib(10,head,0),
+                datetime.datetime.fromisoformat('2021-04-02T12:00:00'),
+                lineValidity = pvmodel.line_validity,
+            )
+            res = None 
+            i = 0
+            
+            while not routing_obj.end:
+                res = routing_obj.step()
+                i += 1
+
+            path_to_end = res.path
+            if not base_gjs:
+                base_gjs = weatherrouting.utils.pathAsGeojson(path_to_end)
+            else:
+                base_gjs["features"] += weatherrouting.utils.pathAsGeojson(path_to_end)["features"]
+            gjs = json.dumps(base_gjs)
         
-        while not self.routing_obj.end:
-            res = self.routing_obj.step()
-            i += 1
-
-
-        path_to_end = res.path
-
-        gjs = json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))
         print(gjs)
-
-
-class TestRouting_gait_upwind(unittest.TestCase):
-    def setUp(self):
-        grib = mock_grib(20,270,0)
-        self.track = [(35.80502,25.27515),(35.81287, 24.53033)]
-        island_route = mock_point_validity(self.track)
-        self.routing_obj = weatherrouting.Routing(
-            LinearBestIsoRouter,
-            polar_bavaria38,
-            self.track,
-            grib,
-            datetime.datetime.fromisoformat('2021-04-02T12:00:00'),
-            pointValidity = island_route.point_validity,
-        )
-        
-    def test_step(self):
-        res = None 
-        i = 0
-        
-        while not self.routing_obj.end:
-            res = self.routing_obj.step()
-            i += 1
-
-
-        path_to_end = res.path
-
-        gjs = json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))
-        print(gjs)
-
 
 class TestRouting_lowWind_noIsland(unittest.TestCase):
     def setUp(self):
