@@ -131,10 +131,10 @@ def pathAsGeojson(path: str):
 			},
 			"properties": {
 				"timestamp": str(wayp[2]),
-				"attr1": wayp[3],
-				"attr2": wayp[4],
-				"attr3": wayp[5],
-				"attr4": wayp[6]
+				"twd": math.degrees(wayp[3]),
+				"tws": wayp[4],
+				"knots": wayp[5],
+				"heading": wayp[6]
 			}
 		}
 		feats.append(feat)
