@@ -5,15 +5,6 @@
 
 A 100% python weather routing library for sailing. 
 
-## License
-
-Read the LICENSE file.
-
-## Credits
-
-This work is partially based and inspired by Riccardo Apolloni
-[Virtual Sailing Simulator](https://web.archive.org/web/20180324153950/https://riccardoapolloni.altervista.org/).
-
 ## Reference
 
 An introductory explanation (english, french, spanish and italian translations) of weather routing tools and methods can be find in: https://globalsolochallenge.com/weather-routing/ 
@@ -64,7 +55,7 @@ def line_validity(lat1, lon1, lat1, lon1)
     return True/False
 ```
 
-### import weatherrouting module
+### Import weatherrouting module
 
 ```python
 from weatherrouting import Routing, Polar
@@ -137,3 +128,12 @@ json.dumps(pathAsGeojson(res.path))
 ```
 
 
+
+## License
+
+Read the LICENSE file.
+
+## Credits
+
+This work is partially based and inspired by Riccardo Apolloni
+[Virtual Sailing Simulator](https://web.archive.org/web/20180324153950/https://riccardoapolloni.altervista.org/).
