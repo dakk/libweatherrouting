@@ -19,7 +19,7 @@ from setuptools import setup
 
 
 setup(name='weatherrouting',
-	version='0.1.2',
+	version='0.1.3',
 	description='Weather routing library for sailing',
 	author=['Davide Gessa'],
 	setup_requires='setuptools',
