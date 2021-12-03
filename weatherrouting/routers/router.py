@@ -85,7 +85,7 @@ class Router:
 	def calculateIsochrones (self, t, isocrone, nextwp):
 		""" Calculate isochrones depending on routageSpeed from polar """
 		def pointF(p, tws, twa, dt, brg):
-			speed = self.polar.getRoutageSpeed (tws, math.copysign (twa,1))
+			speed = self.polar.getSpeed (tws, math.copysign (twa,1))
 			return utils.routagePointDistance (p[0], p[1], speed * dt * utils.NAUTICAL_MILE_IN_KM, brg), speed
 
 		return self._calculateIsochrones(t, isocrone, nextwp, pointF)
