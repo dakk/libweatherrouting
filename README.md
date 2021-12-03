@@ -14,6 +14,9 @@ Read the LICENSE file.
 This work is partially based and inspired by Riccardo Apolloni
 [Virtual Sailing Simulator](https://web.archive.org/web/20180324153950/https://riccardoapolloni.altervista.org/).
 
+## Reference
+
+An introductory explanation (english, french, spanish and italian translations) of weather routing tools and methods can be find in: https://globalsolochallenge.com/weather-routing/ 
 
 ## Install
 
