@@ -25,4 +25,4 @@ class TestUtils(unittest.TestCase):
     def test_max_dist_reaching(self):
         p1 = (5,38)
         maxd = weatherrouting.utils.maxReachDistance(p1,5)
-        self.assertEqual(maxd, 5.000000000000199, 0.001)
+        self.assertAlmostEqual(maxd, 5.000000000000199, delta=0.001)
