@@ -38,42 +38,41 @@ def heading(y,x):
     return (90 - a + 360) % 360
 
 
-class TestRouting_straigth_upwind(unittest.TestCase):
- 
-    def test_step(self):
+# TODO: add asserts for the results
+# class TestRouting_straigth_upwind(unittest.TestCase):
+#     def test_step(self):
+#         base_step = [[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]]
+#         base_start = [34,17]
+#         base_gjs = ""
 
-        base_step = [[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]]
-        base_start = [34,17]
-        base_gjs = ""
-
-        for s in base_step:
-            base_end = [base_start[0]+s[0],base_start[1]+s[1]]
-            head = heading(*s)
-            print ("TEST UPWIND TWD",head,"step",s)
-            pvmodel = mock_point_validity([base_start,base_end])
-            routing_obj = weatherrouting.Routing(
-                LinearBestIsoRouter,
-                polar_bavaria38,
-                [base_start,base_end],
-                mock_grib(10,head,0),
-                datetime.datetime.fromisoformat('2021-04-02T12:00:00'),
-                lineValidity = pvmodel.line_validity,
-            )
-            res = None 
-            i = 0
+#         for s in base_step:
+#             base_end = [base_start[0]+s[0],base_start[1]+s[1]]
+#             head = heading(*s)
+#             print ("TEST UPWIND TWD",head,"step",s)
+#             pvmodel = mock_point_validity([base_start,base_end])
+#             routing_obj = weatherrouting.Routing(
+#                 LinearBestIsoRouter,
+#                 polar_bavaria38,
+#                 [base_start,base_end],
+#                 mock_grib(10,head,0),
+#                 datetime.datetime.fromisoformat('2021-04-02T12:00:00'),
+#                 lineValidity = pvmodel.line_validity,
+#             )
+#             res = None 
+#             i = 0
             
-            while not routing_obj.end:
-                res = routing_obj.step()
-                i += 1
+#             while not routing_obj.end:
+#                 res = routing_obj.step()
+#                 i += 1
 
-            path_to_end = res.path
-            if not base_gjs:
-                base_gjs = weatherrouting.utils.pathAsGeojson(path_to_end)
-            else:
-                base_gjs["features"] += weatherrouting.utils.pathAsGeojson(path_to_end)["features"]
-            gjs = json.dumps(base_gjs)
+#             path_to_end = res.path
+#             if not base_gjs:
+#                 base_gjs = weatherrouting.utils.pathAsGeojson(path_to_end)
+#             else:
+#                 base_gjs["features"] += weatherrouting.utils.pathAsGeojson(path_to_end)["features"]
+#             gjs = json.dumps(base_gjs)
         
-        print(gjs)
+#         print(gjs)
 
 class TestRouting_lowWind_noIsland(unittest.TestCase):
     def setUp(self):
