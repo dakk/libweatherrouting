@@ -24,6 +24,12 @@ class TestPolar(unittest.TestCase):
     def setUp(self):
         self.polar_obj = weatherrouting.Polar(os.path.join(os.path.dirname(__file__),'data/bavaria38.pol'))
 
+    def test_toString(self):
+        f = open(os.path.join(os.path.dirname(__file__),'data/bavaria38.pol'), 'r')
+        d = f.read()
+        f.close()
+        self.assertEqual(self.polar_obj.toString(), d)
+
     def test_getSpeed(self):
         self.assertAlmostEqual(self.polar_obj.getSpeed(8,math.radians(60)),6.1, delta=0.001)
         self.assertAlmostEqual(self.polar_obj.getSpeed(8.3,math.radians(60)),6.205, delta=0.001)
