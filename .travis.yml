@@ -26,8 +26,7 @@ before_install:
   - sudo apt-get --quiet update
   # - sudo pip install --upgrade setuptools
 
-install:
-  - pip install -r requirements.txt
+# install:
 
 script:
   - python setup.py test
