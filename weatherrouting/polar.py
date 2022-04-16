@@ -57,7 +57,7 @@ class Polar:
 
 
     def toString(self) -> str:
-        s = 'TWA\TWS'
+        s = 'TWA\\TWS'
         for x in self.tws:
             s += '\t%d' % x
         s += '\n'
