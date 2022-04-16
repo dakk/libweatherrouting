@@ -17,9 +17,8 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 from setuptools import find_packages
 from setuptools import setup
 
-
 setup(name='weatherrouting',
-	version='0.1.5',
+	version='0.1.6',
 	description='Weather routing library for sailing',
 	author=['Davide Gessa'],
 	setup_requires='setuptools',
