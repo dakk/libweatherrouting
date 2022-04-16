@@ -18,6 +18,7 @@ before_install:
   - sudo apt-get --quiet update
 
 install:
+  - pip install tox
   - pip install .
 script:
   - tox
