@@ -102,9 +102,10 @@ class TestRouting_lowWind_noIsland(unittest.TestCase):
         path_to_end = res.path
         self.assertEqual( res.time, datetime.datetime.fromisoformat('2021-04-02 19:00:00'))
 
-        gjs = json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))
-        self.assertEqual(len(gjs) >= 2666, True)
-        self.assertEqual(hashlib.sha256(gjs.encode()).hexdigest(), '00ff9c12e3926eb76cc973d59550e89a6d4f3e3916ab52f09078207028b2f036')
+        gj = weatherrouting.utils.pathAsGeojson(path_to_end)
+
+        self.assertEqual(len(gj['features']), 9)
+        self.assertEqual(gj['features'][8]['properties']['end-timestamp'], "2021-04-02 19:00:00")
 
 
 class TestRouting_lowWind_mockIsland_5(unittest.TestCase):
