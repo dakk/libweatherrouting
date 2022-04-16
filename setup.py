@@ -19,12 +19,12 @@ from setuptools import setup
 
 
 setup(name='weatherrouting',
-	version='0.1.4',
+	version='0.1.5',
 	description='Weather routing library for sailing',
 	author=['Davide Gessa'],
 	setup_requires='setuptools',
 	author_email='gessadavide@gmail.com',
 	packages=['weatherrouting', 'weatherrouting.routers'],
-	install_requires=['LatLon23'], 
+	install_requires=['latlon3'], 
 	test_suite = 'tests',
 )

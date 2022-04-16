@@ -2,10 +2,6 @@ language: python
 
 dist: focal
 
-#arch:
-#  - amd64  # Default
-#  - arm64  # No Python images yet on xenial
-
 matrix:
   fast_finish: true
   include:
@@ -20,9 +16,8 @@ matrix:
 
 before_install:
   - sudo apt-get --quiet update
-  # - sudo pip install --upgrade setuptools
 
 install:
-
+  - pip install .
 script:
-  - python setup.py test
+  - tox

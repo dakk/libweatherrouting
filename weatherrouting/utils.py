@@ -16,7 +16,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-import LatLon23
+import latlon
 from typing import Tuple 
 import math
 
@@ -37,14 +37,14 @@ def ortodromic2 (lat1: float, lon1: float, lat2: float, lon2: float) -> Tuple[fl
 	return (EARTH_RADIUS * c, a)
 
 def ortodromic (latA: float, lonA: float, latB: float, lonB: float) -> Tuple[float, float]:
-	p1 = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
-	p2 = LatLon23.LatLon(LatLon23.Latitude(latB), LatLon23.Longitude(lonB))
+	p1 = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
+	p2 = latlon.LatLon(latlon.Latitude(latB), latlon.Longitude(lonB))
 
 	return (p1.distance (p2), math.radians (p1.heading_initial(p2)))
 
 def lossodromic (latA: float, lonA: float, latB: float, lonB: float) -> Tuple[float, float]:
-	p1 = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
-	p2 = LatLon23.LatLon(LatLon23.Latitude(latB), LatLon23.Longitude(lonB))
+	p1 = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
+	p2 = latlon.LatLon(latlon.Latitude(latB), latlon.Longitude(lonB))
 
 	return (p1.distance (p2, ellipse = 'sphere'), math.radians (p1.heading_initial(p2)))
 
@@ -57,8 +57,8 @@ def nm2km(d: float) -> float:
 
 def pointDistance (latA: float, lonA: float, latB: float, lonB: float, unit: str = 'nm') -> float:
 	""" Returns the distance between two geo points """
-	p1 = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
-	p2 = LatLon23.LatLon(LatLon23.Latitude(latB), LatLon23.Longitude(lonB))
+	p1 = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
+	p2 = latlon.LatLon(latlon.Latitude(latB), latlon.Longitude(lonB))
 	d = p1.distance (p2)
 
 	if unit == 'nm':
@@ -74,7 +74,7 @@ def routagePointDistance (latA: float, lonA: float, distance: float, hdg: float,
 	elif unit == 'km':
 		d = distance
 
-	p = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
+	p = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
 	of = p.offset (math.degrees (hdg), d).to_string('D')
 	return (float (of[0]), float (of[1]))
 
