@@ -120,7 +120,7 @@ class Router:
 				if self.pointValidity:
 					if not self.pointValidity (ptoiso[0], ptoiso[1]):
 						continue
-				else:
+				if self.lineValidity:
 					if not self.lineValidity (ptoiso[0], ptoiso[1], p[0], p[1]):
 						continue
 				
