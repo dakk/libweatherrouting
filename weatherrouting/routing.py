@@ -103,8 +103,7 @@ class Routing:
 		np = []
 		ptime = None 
 		for x in self.path:
-			if len(x) > 3: nt = x[4]
-			else: nt = x[2]
+			nt = x.time
 
 			if ptime:
 				if ptime < nt:

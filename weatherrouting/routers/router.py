@@ -18,6 +18,8 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import math
 import inspect
+from time import time
+from typing import NamedTuple
 
 from .. import utils
 
@@ -55,6 +57,28 @@ class RoutingResult:
 		self.isochrones = isochrones
 		self.position = position
 		self.progress = progress
+
+
+class IsoPoint(NamedTuple):
+	pos: tuple[float, float]
+	prevIdx: int = -1
+	time: float = None
+	twd: float = 0
+	tws: float = 0
+	speed: float = 0
+	brg: float = 0 
+	nextWPDist: float = 0
+	startWPLos: tuple[float, float] = (0, 0)
+
+	def toList(self):
+		return [self.pos[0], self.pos[1], self.prevIdx, self.time, self.twd, self.tws, self.speed, self.brg, self.nextWPDist, self.startWPLos]
+
+	def lossodromic(self, to):
+		return utils.lossodromic (self.pos[0], self.pos[1], to[0], to[1])
+
+	def pointDistance(self, to):
+		return utils.pointDistance (to[0], to[1], self.pos[0], self.pos[1])
+
 
 class Router:
 	PARAMS = {}
@@ -103,7 +127,7 @@ class Router:
 			p = last[i]
 
 			try:
-				(twd,tws) = self.grib.getWindAt (t, p[0], p[1])
+				(twd,tws) = self.grib.getWindAt (t, p.pos[0], p.pos[1])
 			except:
 				raise (RoutingNoWindException())
 
@@ -112,38 +136,33 @@ class Router:
 				brg = utils.reduce360(twd + twa)
 
 				# Calculate next point
-				ptoiso, speed = pointF(p, tws, twa, dt, brg)
+				ptoiso, speed = pointF(p.pos, tws, twa, dt, brg)
 				
-				if utils.pointDistance (ptoiso[0], ptoiso[1], nextwp[0], nextwp[1]) >= utils.pointDistance (p[0], p[1], nextwp[0], nextwp[1]):
-				 	continue
+				nextwpdist = utils.pointDistance (ptoiso[0], ptoiso[1], nextwp[0], nextwp[1])
+				startwplos = isocrone[0][0].lossodromic ((ptoiso[0], ptoiso[1]))
+
+				if nextwpdist > p.nextWPDist:
+					continue 
 				
 				if self.pointValidity:
 					if not self.pointValidity (ptoiso[0], ptoiso[1]):
 						continue
 				if self.lineValidity:
-					if not self.lineValidity (ptoiso[0], ptoiso[1], p[0], p[1]):
+					if not self.lineValidity (ptoiso[0], ptoiso[1], p.pos[0], p.pos[1]):
 						continue
 				
-				newisopoints.append ((ptoiso[0], ptoiso[1], i, t, twd, tws, speed, math.degrees(brg)))
+				newisopoints.append (IsoPoint((ptoiso[0], ptoiso[1]), i, t, twd, tws, speed, math.degrees(brg), nextwpdist, startwplos))
 
 
-		# sort newisopoints based on bearing
-		isonew = []
-		for i in range(0, len (newisopoints)):
-			try:
-				newisopoints[i] = (newisopoints[i][0], newisopoints[i][1], newisopoints[i][2], utils.lossodromic (isocrone[0][0][0],isocrone[0][0][1],newisopoints[i][0],newisopoints[i][1]), newisopoints[i][3], newisopoints[i][4], newisopoints[i][5], newisopoints[i][6], newisopoints[i][7])
-				isonew.append (newisopoints[i])
-			except:
-				pass
+		newisopoints = sorted (newisopoints, key=(lambda a: a.startWPLos[1]))
 
-		newisopoints = sorted (isonew, key=(lambda a: a[3][1]))
-
-		# remove slow isopoints inside
+		# Remove slow isopoints inside
 		bearing = {}
 		for x in newisopoints:
-			k = str (int (x[3][1] * 100))
+			k = str (int (math.degrees(x.startWPLos[1])))
+
 			if k in bearing:
-				if x[3][0] > bearing[k][3][0]:
+				if x.nextWPDist < bearing[k].nextWPDist:
 					bearing[k] = x
 			else:
 				bearing[k] = x
@@ -152,8 +171,7 @@ class Router:
 		for x in bearing:	
 			isonew.append (bearing[x])
 
-
-		isonew = sorted (isonew, key=(lambda a: a[3][1]))
+		isonew = sorted (isonew, key=(lambda a: a.startWPLos[1]))
 		isocrone.append (isonew)
 
 		return isocrone

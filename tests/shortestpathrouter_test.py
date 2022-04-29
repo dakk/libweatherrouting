@@ -22,7 +22,9 @@ import os
 import json
 import datetime
 
+from weatherrouting.routers.router import IsoPoint
 from weatherrouting.routers.shortestpathrouter import ShortestPathRouter
+
 from .mock_grib import mock_grib
 from .mock_point_validity import mock_point_validity
 
@@ -52,9 +54,9 @@ class TestRouting_noIsland(unittest.TestCase):
         self.assertEqual(i, 3)
         self.assertEqual(not res.path, False)
 
-        path_to_end = res.path + [[*self.track[-1],'']]
+        path_to_end = res.path + [IsoPoint(self.track[-1])]
         self.assertEqual( res.time, datetime.datetime.fromisoformat('2021-04-02 14:00:00'))
-        self.assertEqual(len(json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))), 1193)
+        self.assertEqual(len(json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))), 1201)
 
 
 class TestRouting_mockIsland_5(unittest.TestCase):

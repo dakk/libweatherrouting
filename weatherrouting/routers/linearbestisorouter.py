@@ -36,25 +36,26 @@ class LinearBestIsoRouter (Router):
 			nonlocal position
 			path.append (p)
 			for iso in isoc[::-1][1::]:
-				path.append (iso[path[-1][2]])
+				path.append (iso[path[-1].prevIdx])
 			path = path[::-1]
-			position = path[-1]
+			position = path[-1].pos
 		
 		if self.grib.getWindAt (time + datetime.timedelta(hours=1), end[0],end[1]):
 			if lastlog != None and len (lastlog.isochrones) > 0:
 				isoc = isoF(time + datetime.timedelta(hours=1), lastlog.isochrones, end)
 			else:
-				isoc = isoF(time + datetime.timedelta(hours=1), [[(start[0], start[1], time)]], end)
+				nwdist = utils.pointDistance (end[0], end[1], start[0], start[1])
+				isoc = isoF(time + datetime.timedelta(hours=1), [[IsoPoint((start[0], start[1]), time=time, nextWPDist=nwdist)]], end)
 
 			nearest_dist = self.getParamValue('minIncrease')
 			nearest_solution = None
 			for p in isoc[-1]:
-				distance_to_end_point = utils.pointDistance (end[0],end[1], p[0], p[1])
+				distance_to_end_point = p.pointDistance (end)
 				if distance_to_end_point < self.getParamValue('minIncrease'):
-					(twd,tws) = self.grib.getWindAt (time + datetime.timedelta(hours=1), p[0], p[1])
-					maxReachDistance = utils.maxReachDistance(p, p[6])
-					if utils.pointDistance (end[0],end[1], p[0], p[1]) < abs(maxReachDistance*1.1):
-						if (not self.pointValidity or self.pointValidity(end[0],end[1])) and (not self.lineValidity or self.lineValidity(end[0],end[1], p[0], p[1])):
+					(twd,tws) = self.grib.getWindAt (time + datetime.timedelta(hours=1), p.pos[0], p.pos[1])
+					maxReachDistance = utils.maxReachDistance(p.pos, p.speed)
+					if distance_to_end_point < abs(maxReachDistance*1.1):
+						if (not self.pointValidity or self.pointValidity(end[0],end[1])) and (not self.lineValidity or self.lineValidity(end[0],end[1], p.pos[0], p.pos[1])):
 							if distance_to_end_point < nearest_dist:
 								nearest_dist = distance_to_end_point
 								nearest_solution = p
@@ -66,7 +67,7 @@ class LinearBestIsoRouter (Router):
 			minDist = 1000000
 			isoc = lastlog.isochrones
 			for p in isoc[-1]:
-				checkDist = utils.pointDistance (end[0],end[1], p[0], p[1]) 
+				checkDist = p.pointDistance (end) 
 				if checkDist < minDist:
 					minDist = checkDist
 					minP = p

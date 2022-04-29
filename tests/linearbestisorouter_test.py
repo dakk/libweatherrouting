@@ -130,7 +130,7 @@ class TestRouting_lowWind_mockIsland_5(unittest.TestCase):
             res = self.routing_obj.step()
             i += 1
 
-        self.assertEqual(i, 7)
+        self.assertEqual(i, 8)
         self.assertEqual(not res.path, False)
 
 
@@ -181,7 +181,7 @@ class checkRoute_highWind_mockIsland_3(unittest.TestCase):
             res = self.routing_obj.step()
             i += 1
         
-        self.assertEqual(i, 6)
+        self.assertEqual(i, 7)
         self.assertEqual(not res.path, False)
 
 class checkRoute_out_of_scope(unittest.TestCase):

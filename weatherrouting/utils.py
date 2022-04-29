@@ -20,6 +20,7 @@ import latlon
 from typing import Tuple 
 import math
 
+
 EARTH_RADIUS = 60.0 * 360 / (2 * math.pi) # nm
 NAUTICAL_MILE_IN_KM = 1.852
 
@@ -107,38 +108,31 @@ def reduce180 (alfa: float) -> float:
 		return 0.0
 	return alfa
 
-def pathAsGeojson(path: str):
-	tr = []
-	for wp in path:
-		if len(wp) == 3:
-			tr.append((wp[0], wp[1], str(wp[2]), 0, 0, 0, 0))
-		else:
-			tr.append((wp[0], wp[1], str(wp[4]), wp[5], wp[6], wp[7], wp[8]))
-
+def pathAsGeojson(path) -> object:
 	feats = []
 	route = []
 
-	for order,wayp in enumerate(tr):
+	for order, wayp in enumerate(path):
 		feat = {
 			"type": "Feature",
 			"id": order,
 			"geometry": {
 				"type": "Point",
 				"coordinates": [ # longitude, latitude
-					wayp[1],
-					wayp[0]
+					wayp.pos[1],
+					wayp.pos[0]
 				]
 			},
 			"properties": {
-				"timestamp": str(wayp[2]),
-				"twd": math.degrees(wayp[3]),
-				"tws": wayp[4],
-				"knots": wayp[5],
-				"heading": wayp[6]
+				"timestamp": str(wayp.time),
+				"twd": math.degrees(wayp.twd),
+				"tws": wayp.tws,
+				"knots": wayp.speed,
+				"heading": wayp.brg
 			}
 		}
 		feats.append(feat)
-		route.append([wayp[1], wayp[0]]) # longitude, latitude
+		route.append([wayp.pos[1], wayp.pos[0]]) # longitude, latitude
 
 	feats.append({
 		"type": "Feature",
@@ -148,8 +142,8 @@ def pathAsGeojson(path: str):
 			"coordinates": route
 		},
 		"properties": {
-			"start-timestamp": str(tr[0][2]),
-			"end-timestamp": str(tr[-1][2])
+			"start-timestamp": str(path[0].time),
+			"end-timestamp": str(path[-1].time)
 		}
 	})
 
