@@ -144,18 +144,19 @@ class Router:
 				if nextwpdist > p.nextWPDist:
 					continue 
 				
-				if self.pointValidity:
-					if not self.pointValidity (ptoiso[0], ptoiso[1]):
-						continue
-				if self.lineValidity:
-					if not self.lineValidity (ptoiso[0], ptoiso[1], p.pos[0], p.pos[1]):
-						continue
+				# if self.pointValidity:
+				# 	if not self.pointValidity (ptoiso[0], ptoiso[1]):
+				# 		continue
+				# if self.lineValidity:
+				# 	if not self.lineValidity (ptoiso[0], ptoiso[1], p.pos[0], p.pos[1]):
+				# 		continue
 				
 				newisopoints.append (IsoPoint((ptoiso[0], ptoiso[1]), i, t, twd, tws, speed, math.degrees(brg), nextwpdist, startwplos))
 
 
 		newisopoints = sorted (newisopoints, key=(lambda a: a.startWPLos[1]))
 
+				
 		# Remove slow isopoints inside
 		bearing = {}
 		for x in newisopoints:
@@ -170,6 +171,19 @@ class Router:
 		isonew = []
 		for x in bearing:	
 			isonew.append (bearing[x])
+
+
+		def valid(a):
+			if self.pointValidity:
+				if not self.pointValidity (a.pos[0], a.pos[1]):
+					return False
+			if self.lineValidity:
+				if not self.lineValidity (a.pos[0], a.pos[1], last[a.prevIdx].pos[0], last[a.prevIdx].pos[1]):
+					return False 
+			return True
+			
+		isonew = list(filter(lambda a: valid(a), isonew))
+
 
 		isonew = sorted (isonew, key=(lambda a: a.startWPLos[1]))
 		isocrone.append (isonew)
