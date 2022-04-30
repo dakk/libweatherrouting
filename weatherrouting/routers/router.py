@@ -60,7 +60,7 @@ class RoutingResult:
 
 
 class IsoPoint(NamedTuple):
-	pos: tuple[float, float]
+	pos: tuple # Commented for < 3.9 compat [float, float]
 	prevIdx: int = -1
 	time: float = None
 	twd: float = 0
@@ -68,7 +68,7 @@ class IsoPoint(NamedTuple):
 	speed: float = 0
 	brg: float = 0 
 	nextWPDist: float = 0
-	startWPLos: tuple[float, float] = (0, 0)
+	startWPLos: tuple = (0, 0) # Commented for < 3.9 compat [float, float] = (0, 0)
 
 	def toList(self):
 		return [self.pos[0], self.pos[1], self.prevIdx, self.time, self.twd, self.tws, self.speed, self.brg, self.nextWPDist, self.startWPLos]

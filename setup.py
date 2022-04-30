@@ -18,7 +18,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 setup(name='weatherrouting',
-	version='0.1.7.1',
+	version='0.1.7.2',
 	description='Weather routing library for sailing',
 	author=['Davide Gessa'],
 	setup_requires='setuptools',
