@@ -59,6 +59,8 @@ class RoutingResult:
 		self.position = position
 		self.progress = progress
 
+	def __str__(self):
+		return 'RoutingResult(time=%s, path=%s, isochrones=%d, position=%s, progress=%f)' % (str(self.time), self.path, len(self.isochrones[-1]), self.position, self.progress)
 
 class IsoPoint(NamedTuple):
 	pos: Tuple[float, float]
