@@ -84,11 +84,18 @@ class IsoPoint(NamedTuple):
 class Router:
 	PARAMS = {}
 
-	def __init__ (self, polar, grib, pointValidity = None, lineValidity = None):
+	def __init__ (self, polar, grib, pointValidity = None, lineValidity = None, pointsValidity = None, linesValidity = None):
 		self.polar = polar
 		self.grib = grib
 		self.pointValidity = pointValidity
 		self.lineValidity = lineValidity
+		self.pointsValidity = pointsValidity
+		self.linesValidity = linesValidity
+
+		if self.pointsValidity:
+			self.pointValidity = None 
+		if self.linesValidity:
+			self.lineValidity = None
 
 	def setParamValue(self, code, value):
 		self.PARAMS[code] = value
@@ -115,7 +122,41 @@ class Router:
 
 		return self._calculateIsochrones(t, isocrone, nextwp, pointF)
 
+	def _filterValidity(self, isonew, last):
+		def validPoint(a):
+			if not self.pointValidity (a.pos[0], a.pos[1]):
+				return False
+			return True 
+		
+		def validLine(a):
+			if not self.lineValidity (a.pos[0], a.pos[1], last[a.prevIdx].pos[0], last[a.prevIdx].pos[1]):
+				return False 
+			return True
 
+
+		if self.pointValidity:
+			isonew = list(filter(lambda a: validPoint(a), isonew))
+		if self.lineValidity:
+			isonew = list(filter(lambda a: validLine(a), isonew))
+		if self.pointsValidity:
+			pp = list(map(lambda a: a.pos, isonew))
+			pv = self.pointsValidity (pp)
+
+			for x in range(len(isonew)):
+				if not pv[x]:
+					isonew[x] = None
+			isonew = list(filter(lambda a: a != None, isonew))
+		if self.linesValidity:
+			pp = list(map(lambda a: [a.pos[0], a.pos[1], last[a.prevIdx].pos[0], last[a.prevIdx].pos[1]], isonew))
+			pv = self.linesValidity (pp)
+
+			for x in range(len(isonew)):
+				if not pv[x]:
+					isonew[x] = None
+			isonew = list(filter(lambda a: a != None, isonew))
+
+		return isonew 
+		
 	def _calculateIsochrones (self, t, isocrone, nextwp, pointF):
 		""" Calcuates isochrones based on pointF next point calculation """
 		dt = (1. / 60. * 60.)
@@ -174,17 +215,7 @@ class Router:
 			isonew.append (bearing[x])
 
 
-		def valid(a):
-			if self.pointValidity:
-				if not self.pointValidity (a.pos[0], a.pos[1]):
-					return False
-			if self.lineValidity:
-				if not self.lineValidity (a.pos[0], a.pos[1], last[a.prevIdx].pos[0], last[a.prevIdx].pos[1]):
-					return False 
-			return True
-			
-		isonew = list(filter(lambda a: valid(a), isonew))
-
+		isonew = self._filterValidity(isonew, last)
 
 		isonew = sorted (isonew, key=(lambda a: a.startWPLos[1]))
 		isocrone.append (isonew)
