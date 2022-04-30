@@ -16,10 +16,12 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-import latlon
 from typing import Tuple 
 import math
+import latlon
 
+# from geographiclib.geodesic import Geodesic
+# geod = Geodesic.WGS84
 
 EARTH_RADIUS = 60.0 * 360 / (2 * math.pi) # nm
 NAUTICAL_MILE_IN_KM = 1.852
@@ -38,15 +40,19 @@ def ortodromic2 (lat1: float, lon1: float, lat2: float, lon2: float) -> Tuple[fl
 	return (EARTH_RADIUS * c, a)
 
 def ortodromic (latA: float, lonA: float, latB: float, lonB: float) -> Tuple[float, float]:
+	# g = geod.Inverse(latA, lonA, latB, lonB)
+	# return (g['s12'] * 1e-3, math.radians (g['azi1']))
+
 	p1 = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
 	p2 = latlon.LatLon(latlon.Latitude(latB), latlon.Longitude(lonB))
-
 	return (p1.distance (p2), math.radians (p1.heading_initial(p2)))
 
 def lossodromic (latA: float, lonA: float, latB: float, lonB: float) -> Tuple[float, float]:
+	# g = geod.Inverse(latA, lonA, latB, lonB)
+	# return (g['s12'] * 1e-3, math.radians (g['azi1']))
+	
 	p1 = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
 	p2 = latlon.LatLon(latlon.Latitude(latB), latlon.Longitude(lonB))
-
 	return (p1.distance (p2, ellipse = 'sphere'), math.radians (p1.heading_initial(p2)))
 
 
@@ -62,18 +68,22 @@ def pointDistance (latA: float, lonA: float, latB: float, lonB: float, unit: str
 	p2 = latlon.LatLon(latlon.Latitude(latB), latlon.Longitude(lonB))
 	d = p1.distance (p2)
 
+	# d = ortodromic(latA, lonA, latB, lonB)[0]
+	
 	if unit == 'nm':
 		return km2nm(d)
 	elif unit == 'km':
 		return d
 	
-
 def routagePointDistance (latA: float, lonA: float, distance: float, hdg: float, unit: str='nm') -> Tuple[float, float]:
 	""" Returns the point from (latA, lonA) to the given (distance, hdg) """
 	if unit == 'nm':
 		d = nm2km(distance)
 	elif unit == 'km':
 		d = distance
+
+	# g = geod.Direct(latA, lonA, math.degrees(hdg), d * 1e3)
+	# return (g['lat2'], g['lon2'])
 
 	p = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
 	of = p.offset (math.degrees (hdg), d).to_string('D')

@@ -18,12 +18,12 @@ from setuptools import find_packages
 from setuptools import setup
 
 setup(name='weatherrouting',
-	version='0.1.7.2',
+	version='0.1.7.5',
 	description='Weather routing library for sailing',
 	author=['Davide Gessa'],
 	setup_requires='setuptools',
 	author_email='gessadavide@gmail.com',
 	packages=['weatherrouting', 'weatherrouting.routers'],
-	install_requires=['latlon3'], 
+	install_requires=['latlon3'], # ['geographiclib'], 
 	test_suite = 'tests',
 )
