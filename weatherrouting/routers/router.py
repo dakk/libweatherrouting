@@ -120,7 +120,9 @@ class Router:
 		""" Calculate isochrones depending on routageSpeed from polar """
 		def pointF(p, tws, twa, dt, brg):
 			speed = self.polar.getSpeed (tws, math.copysign (twa,1))
-			return utils.routagePointDistance (p[0], p[1], speed * dt * utils.NAUTICAL_MILE_IN_KM, brg), speed
+			rpd = utils.routagePointDistance (p[0], p[1], speed * dt * utils.NAUTICAL_MILE_IN_KM, brg), speed
+			# print ('tws', tws, 'sog', speed, 'twa', math.degrees(twa), 'brg', math.degrees(brg), 'rpd', rpd)
+			return rpd
 
 		return self._calculateIsochrones(t, isocrone, nextwp, pointF)
 
@@ -177,6 +179,7 @@ class Router:
 
 			for twa in range(-180,180,5):
 				twa = math.radians(twa)
+				twd = math.radians(twd)
 				brg = utils.reduce360(twd + twa)
 
 				# Calculate next point
