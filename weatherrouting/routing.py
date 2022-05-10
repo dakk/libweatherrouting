@@ -105,7 +105,7 @@ class Routing:
 			self.position = res.position
 			self.path = self.path + res.path
 			self.wp += 1
-			res.isochrones = []
+			# res.isochrones = []
 
 		np = []
 		ptime = None 
