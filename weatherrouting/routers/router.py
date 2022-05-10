@@ -76,6 +76,9 @@ class IsoPoint(NamedTuple):
 	def toList(self):
 		return [self.pos[0], self.pos[1], self.prevIdx, self.time, self.twd, self.tws, self.speed, self.brg, self.nextWPDist, self.startWPLos]
 
+	def fromList(l):
+		return IsoPoint((l[0], l[1]), l[2], l[3], l[4], l[5], l[6], l[7], l[8], l[9])
+		
 	def lossodromic(self, to):
 		return utils.lossodromic (self.pos[0], self.pos[1], to[0], to[1])
 
