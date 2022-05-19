@@ -60,7 +60,8 @@ class RoutingResult:
 		self.progress = progress
 
 	def __str__(self):
-		return 'RoutingResult(time=%s, path=%s, position=%s, progress=%f)' % (str(self.time), self.path, self.position, self.progress)
+		return 'RoutingResult(time=%s, path=%s, progress=%f)' % (str(self.time), list(map(lambda x: x.toList(True), self.path)), self.progress)
+		# position=%s, self.position, 
 
 class IsoPoint(NamedTuple):
 	pos: Tuple[float, float]
@@ -73,7 +74,9 @@ class IsoPoint(NamedTuple):
 	nextWPDist: float = 0
 	startWPLos: Tuple[float, float] = (0, 0)
 
-	def toList(self):
+	def toList(self, onlyPos=False):
+		if onlyPos:
+			return [self.pos[0], self.pos[1]]
 		return [self.pos[0], self.pos[1], self.prevIdx, self.time, self.twd, self.tws, self.speed, self.brg, self.nextWPDist, self.startWPLos]
 
 	def fromList(l):
@@ -84,6 +87,7 @@ class IsoPoint(NamedTuple):
 
 	def pointDistance(self, to):
 		return utils.pointDistance (to[0], to[1], self.pos[0], self.pos[1])
+
 
 
 class Router:

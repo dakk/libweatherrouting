@@ -70,6 +70,7 @@ class Routing:
 		self.time = startDatetime
 		self.grib = grib
 		self.log = []   
+		self._startingNewPoint = True
 
 		if startPosition:
 			self.wp = 0
@@ -92,20 +93,21 @@ class Routing:
 		# Next waypoint
 		nextwp = self.track[self.wp]
 
-		if len (self.log) > 0:
-			res = self.algorithm.route (self.log[-1], self.time, self.position, nextwp)
-		else:
+		if self._startingNewPoint or len (self.log) == 0:
 			res = self.algorithm.route (None, self.time, self.position, nextwp)
-
+			self._startingNewPoint = False
+		else:
+			res = self.algorithm.route (self.log[-1], self.time, self.position, nextwp)
 
 		#self.time += 0.2
-		progress = len (self.log) * 5
+		ff = 100 / len(self.track)
+		progress = ff * self.wp + len(self.log) % ff
 
 		if len (res.path) != 0:
 			self.position = res.position
 			self.path = self.path + res.path
 			self.wp += 1
-			# res.isochrones = []
+			self._startingNewPoint = True
 
 		np = []
 		ptime = None 
