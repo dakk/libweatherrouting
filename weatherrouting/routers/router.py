@@ -16,12 +16,10 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
+from concurrent.futures import ThreadPoolExecutor
 import math
-import inspect
-from time import time
 from typing import NamedTuple
 from typing import Tuple 
-
 from .. import utils
 
 # http://www.tecepe.com.br/nav/vrtool/routing.htm
@@ -120,7 +118,7 @@ class Router:
 			speed = fixedSpeed
 			return utils.routagePointDistance (p[0], p[1], speed * dt * utils.NAUTICAL_MILE_IN_KM, brg), speed
 
-		return self._calculateIsochrones(t, isocrone, nextwp, pointF)
+		return self._calculateIsochronesConcurrent(t, isocrone, nextwp, pointF)
 		
 
 	def calculateIsochrones (self, t, isocrone, nextwp):
@@ -131,7 +129,7 @@ class Router:
 			# print ('tws', tws, 'sog', speed, 'twa', math.degrees(twa), 'brg', math.degrees(brg), 'rpd', rpd)
 			return rpd
 
-		return self._calculateIsochrones(t, isocrone, nextwp, pointF)
+		return self._calculateIsochronesConcurrent(t, isocrone, nextwp, pointF)
 
 	def _filterValidity(self, isonew, last):
 		def validPoint(a):
@@ -168,6 +166,82 @@ class Router:
 
 		return isonew 
 		
+
+	def _calculateIsochronesConcurrent (self, t, isocrone, nextwp, pointF):
+		""" Calcuates isochrones based on pointF next point calculation """
+		dt = (1. / 60. * 60.)
+		last = isocrone [-1]
+
+		newisopoints = []
+
+		# foreach point of the iso
+		def cisopoints(i):
+			cisos = []
+			p = last[i]
+
+			try:
+				(twd,tws) = self.grib.getWindAt (t, p.pos[0], p.pos[1])
+			except:
+				raise (RoutingNoWindException())
+
+			for twa in range(-180,180,5):
+				twa = math.radians(twa)
+				twd = math.radians(twd)
+				brg = utils.reduce360(twd + twa)
+
+				# Calculate next point
+				ptoiso, speed = pointF(p.pos, tws, twa, dt, brg)
+				
+				nextwpdist = utils.pointDistance (ptoiso[0], ptoiso[1], nextwp[0], nextwp[1])
+				startwplos = isocrone[0][0].lossodromic ((ptoiso[0], ptoiso[1]))
+
+				if nextwpdist > p.nextWPDist:
+					continue 
+				
+				# if self.pointValidity:
+				# 	if not self.pointValidity (ptoiso[0], ptoiso[1]):
+				# 		continue
+				# if self.lineValidity:
+				# 	if not self.lineValidity (ptoiso[0], ptoiso[1], p.pos[0], p.pos[1]):
+				# 		continue
+				
+				cisos.append (IsoPoint((ptoiso[0], ptoiso[1]), i, t, twd, tws, speed, math.degrees(brg), nextwpdist, startwplos))
+
+			return cisos 
+
+		executor = ThreadPoolExecutor()
+		for x in executor.map (cisopoints, range(0, len(last))):
+			newisopoints.extend (x)
+
+		executor.shutdown()
+
+		newisopoints = sorted (newisopoints, key=(lambda a: a.startWPLos[1]))
+
+				
+		# Remove slow isopoints inside
+		bearing = {}
+		for x in newisopoints:
+			k = str (int (math.degrees(x.startWPLos[1])))
+
+			if k in bearing:
+				if x.nextWPDist < bearing[k].nextWPDist:
+					bearing[k] = x
+			else:
+				bearing[k] = x
+
+		isonew = []
+		for x in bearing:	
+			isonew.append (bearing[x])
+
+
+		isonew = self._filterValidity(isonew, last)
+
+		isonew = sorted (isonew, key=(lambda a: a.startWPLos[1]))
+		isocrone.append (isonew)
+
+		return isocrone
+
+
 	def _calculateIsochrones (self, t, isocrone, nextwp, pointF):
 		""" Calcuates isochrones based on pointF next point calculation """
 		dt = (1. / 60. * 60.)
