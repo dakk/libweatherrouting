@@ -16,7 +16,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-from typing import Tuple 
+from typing import Tuple
 import math
 import latlon
 
@@ -50,7 +50,7 @@ def ortodromic (latA: float, lonA: float, latB: float, lonB: float) -> Tuple[flo
 def lossodromic (latA: float, lonA: float, latB: float, lonB: float) -> Tuple[float, float]:
 	# g = geod.Inverse(latA, lonA, latB, lonB)
 	# return (g['s12'] * 1e-3, math.radians (g['azi1']))
-	
+
 	p1 = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
 	p2 = latlon.LatLon(latlon.Latitude(latB), latlon.Longitude(lonB))
 	return (p1.distance (p2, ellipse = 'sphere'), math.radians (p1.heading_initial(p2)))
@@ -69,12 +69,12 @@ def pointDistance (latA: float, lonA: float, latB: float, lonB: float, unit: str
 	d = p1.distance (p2)
 
 	# d = ortodromic(latA, lonA, latB, lonB)[0]
-	
+
 	if unit == 'nm':
 		return km2nm(d)
 	elif unit == 'km':
 		return d
-	
+
 def routagePointDistance (latA: float, lonA: float, distance: float, hdg: float, unit: str='nm') -> Tuple[float, float]:
 	""" Returns the point from (latA, lonA) to the given (distance, hdg) """
 	if unit == 'nm':
@@ -98,7 +98,7 @@ def maxReachDistance(p, speed: float, dt: float = (1. / 60. * 60.)) -> float:
 def reduce360 (alfa: float) -> float:
 	if math.isnan (alfa):
 		return 0.0
-		
+
 	n=int(alfa*0.5/math.pi)
 	n=math.copysign(n,1)
 	if alfa>2.0*math.pi:
@@ -146,7 +146,7 @@ def pathAsGeojson(path) -> object:
 
 	feats.append({
 		"type": "Feature",
-		"id": order+1,
+		"id": 999,
 		"geometry": {
 			"type": "LineString",
 			"coordinates": route
@@ -157,9 +157,7 @@ def pathAsGeojson(path) -> object:
 		}
 	})
 
-	gj = {
+	return {
 		"type": "FeatureCollection",
 		"features": feats
 	}
-
-	return gj

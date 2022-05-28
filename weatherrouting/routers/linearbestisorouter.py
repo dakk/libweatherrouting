@@ -41,7 +41,7 @@ class LinearBestIsoRouter (Router):
 			position = path[-1].pos
 		
 		if self.grib.getWindAt (time + datetime.timedelta(hours=1), end[0],end[1]):
-			if lastlog != None and len (lastlog.isochrones) > 0:
+			if lastlog is None and len (lastlog.isochrones) > 0:
 				isoc = isoF(time + datetime.timedelta(hours=1), lastlog.isochrones, end)
 			else:
 				nwdist = utils.pointDistance (end[0], end[1], start[0], start[1])
