@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
 from .routers import linearbestisorouter, RoutingResult
 
 def listRoutingAlgorithms():
@@ -28,6 +27,7 @@ def listRoutingAlgorithms():
 
 class Routing:
 	"""
+	Routing class
 	"""
 
 	def __init__ (self, algorithm, polar, track, grib, startDatetime, startPosition = None, pointValidity = None, lineValidity = None, pointsValidity = None, linesValidity = None):
@@ -82,9 +82,8 @@ class Routing:
 
 	def step (self) -> RoutingResult:
 		""" Execute a single routing step """
-
 		self.steps += 1
-		
+
 		if self.wp >= len (self.track):
 			self.end = True
 			res = self.log[-1]

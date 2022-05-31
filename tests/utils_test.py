@@ -14,15 +14,14 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
 import unittest
 import weatherrouting
 
 class TestUtils(unittest.TestCase):
-    def test_pointDistance(self):
-        self.assertEqual(round(weatherrouting.utils.pointDistance(0.0, 0.0, 1/60, 0.0)), 1)
+	def test_pointDistance(self):
+		self.assertEqual(round(weatherrouting.utils.pointDistance(0.0, 0.0, 1/60, 0.0)), 1)
 
-    def test_max_dist_reaching(self):
-        p1 = (5,38)
-        maxd = weatherrouting.utils.maxReachDistance(p1,5)
-        self.assertAlmostEqual(maxd, 5.000000000000199, delta=0.001)
+	def test_max_dist_reaching(self):
+		p1 = (5,38)
+		maxd = weatherrouting.utils.maxReachDistance(p1,5)
+		self.assertAlmostEqual(maxd, 5.000000000000199, delta=0.001)

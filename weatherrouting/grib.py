@@ -13,17 +13,16 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-from typing import Tuple 
+from typing import Tuple
 
 class Grib:
-	""" 
+	"""
 	Grib class is an abstract class that should be implement for providing grib data to routers
 	"""
 
 	def getWindAt(self, t: float, lat: float, lon: float) -> Tuple[float, float]:
-		""" 
-		Returns (twd: radians, tws: knots) for the given point (lat, lon) at time t 
+		"""
+		Returns (twd: radians, tws: knots) for the given point (lat, lon) at time t
 		or None if running out of temporal/geographic grib scope
 		"""
-		raise (Exception('Not implemented'))
-
+		raise Exception('Not implemented')

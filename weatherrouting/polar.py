@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-from typing import Tuple 
+from typing import Tuple
 from io import FileIO
 import math
 
@@ -190,5 +190,3 @@ class Polar:
 			if twa > twadown:
 				twa = twadown
 		return twa
-
-		

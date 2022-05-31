@@ -13,8 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-from setuptools import find_packages
 from setuptools import setup
 
 setup(name='weatherrouting',
@@ -24,6 +22,6 @@ setup(name='weatherrouting',
 	setup_requires='setuptools',
 	author_email='gessadavide@gmail.com',
 	packages=['weatherrouting', 'weatherrouting.routers'],
-	install_requires=['latlon3'], # ['geographiclib'], 
+	install_requires=['latlon3'], # ['geographiclib'],
 	test_suite = 'tests',
 )

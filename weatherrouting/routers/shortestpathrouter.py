@@ -15,16 +15,16 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-import datetime
-from .. import utils
-from .linearbestisorouter import *
+from .linearbestisorouter import RouterParam, RoutingResult, LinearBestIsoRouter
 
 class ShortestPathRouter (LinearBestIsoRouter):
 	PARAMS = {
-		'minIncrease': RouterParam('minIncrease', 'Minimum increase (nm)', 'float', 'Set the minimum value for selecting a new valid point', default=10.0, lower=1.0, upper=100.0, step=0.1, digits=1),
-		'fixedSpeed': RouterParam('fixedSpeed', 'Fixed speed (kn)', 'float', 'Set the fixed speed', default=5.0, lower=1.0, upper=60.0, step=0.1, digits=1)
+		'minIncrease': RouterParam('minIncrease', 'Minimum increase (nm)', 'float',
+			'Set the minimum value for selecting a new valid point', default=10.0, lower=1.0, upper=100.0, step=0.1, digits=1),
+		'fixedSpeed': RouterParam('fixedSpeed', 'Fixed speed (kn)', 'float',
+			'Set the fixed speed', default=5.0, lower=1.0, upper=60.0, step=0.1, digits=1)
 	}
 
 	def route (self, lastlog, time, start, end) -> RoutingResult:
-		return self._route(lastlog, time, start, end, lambda time, isoc, end: self.calculateShortestPathIsochrones (self.getParamValue('fixedSpeed'), time, isoc, end))
+		return self._route(lastlog, time, start, end, lambda time, isoc,
+			end: self.calculateShortestPathIsochrones (self.getParamValue('fixedSpeed'), time, isoc, end))

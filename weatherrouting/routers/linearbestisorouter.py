@@ -17,12 +17,13 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import datetime
+from .router import RouterParam, RoutingResult, Router, IsoPoint
 from .. import utils
-from .router import *
 
 class LinearBestIsoRouter (Router):
 	PARAMS = {
-		'minIncrease': RouterParam('minIncrease', 'Minimum increase (nm)', 'float', 'Set the minimum value for selecting a new valid point', default=10.0, lower=1.0, upper=100.0, step=0.1, digits=1)
+		'minIncrease': RouterParam('minIncrease', 'Minimum increase (nm)', 'float',
+			'Set the minimum value for selecting a new valid point', default=10.0, lower=1.0, upper=100.0, step=0.1, digits=1)
 	}
 
 
@@ -39,13 +40,14 @@ class LinearBestIsoRouter (Router):
 				path.append (iso[path[-1].prevIdx])
 			path = path[::-1]
 			position = path[-1].pos
-		
+
 		if self.grib.getWindAt (time + datetime.timedelta(hours=1), end[0],end[1]):
 			if lastlog is None and len (lastlog.isochrones) > 0:
 				isoc = isoF(time + datetime.timedelta(hours=1), lastlog.isochrones, end)
 			else:
 				nwdist = utils.pointDistance (end[0], end[1], start[0], start[1])
-				isoc = isoF(time + datetime.timedelta(hours=1), [[IsoPoint((start[0], start[1]), time=time, nextWPDist=nwdist)]], end)
+				isoc = isoF(time + datetime.timedelta(hours=1),
+					[[IsoPoint((start[0], start[1]), time=time, nextWPDist=nwdist)]], end)
 
 			nearest_dist = self.getParamValue('minIncrease')
 			nearest_solution = None
@@ -63,7 +65,7 @@ class LinearBestIsoRouter (Router):
 				generate_path(nearest_solution)
 
 		# out of grib scope
-		else: 
+		else:
 			minDist = 1000000
 			isoc = lastlog.isochrones
 			for p in isoc[-1]:
@@ -76,5 +78,5 @@ class LinearBestIsoRouter (Router):
 		return RoutingResult(time=time + datetime.timedelta(hours=1), path=path, position=position, isochrones=isoc)
 
 
-	def route (self, lastlog, time, start, end) -> RoutingResult:
-		return self._route(lastlog, time, start, end, self.calculateIsochrones)
+	def route (self, lastlog, t, start, end) -> RoutingResult:
+		return self._route(lastlog, t, start, end, self.calculateIsochrones)
