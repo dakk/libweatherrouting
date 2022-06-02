@@ -30,7 +30,8 @@ class Routing:
 	Routing class
 	"""
 
-	def __init__ (self, algorithm, polar, track, grib, startDatetime, startPosition = None, pointValidity = None, lineValidity = None, pointsValidity = None, linesValidity = None):
+	def __init__ (self, algorithm, polar, track, grib, startDatetime, startPosition = None,
+		pointValidity = None, lineValidity = None, pointsValidity = None, linesValidity = None):
 		"""
 		Parameters
 		----------
@@ -52,13 +53,16 @@ class Routing:
 			A functions that receives lat and lon and returns True if the point is valid (ie: in the sea)
 		lineValidity : function(lat1, lon1, lat2, lon2)
 			Optional, default to None
-			A functions that receives a vector defined by lat1, lon1, lat2, lon2 and returns True if the line is valid (ie: completely in the sea)
+			A functions that receives a vector defined by lat1, lon1, lat2, lon2 and returns True if the
+			line is valid (ie: completely in the sea)
 		pointsValidity : function (latlons)
 			Optional, default to None
-			A functions that receives a list of latlon and returns a list of boolean with True if the point at i is valid (ie: in the sea)
+			A functions that receives a list of latlon and returns a list of boolean with True if the point
+			at i is valid (ie: in the sea)
 		linesValidity : function(latlons)
 			Optional, default to None
-			A functions that receives a list of vectors defined by lat1, lon1, lat2, lon2 and returns a list of boolean with True if the line at i is valid (ie: completely in the sea)
+			A functions that receives a list of vectors defined by lat1, lon1, lat2, lon2 and returns a
+			list of boolean with True if the line at i is valid (ie: completely in the sea)
 
 		"""
 
@@ -69,7 +73,7 @@ class Routing:
 		self.path = []
 		self.time = startDatetime
 		self.grib = grib
-		self.log = []   
+		self.log = []
 		self._startingNewPoint = True
 
 		if startPosition:
@@ -109,7 +113,7 @@ class Routing:
 			self._startingNewPoint = True
 
 		np = []
-		ptime = None 
+		ptime = None
 		for x in self.path:
 			nt = x.time
 

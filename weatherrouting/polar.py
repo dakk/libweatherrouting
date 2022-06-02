@@ -68,7 +68,7 @@ class Polar:
 			sl = self.speedTable[l]
 
 			for x in sl:
-				s += '\t{:.1f}'.format(x)
+				s += f'\t{x:.1f}'
 			s += '\n'
 
 			l += 1

@@ -42,7 +42,7 @@ class LinearBestIsoRouter (Router):
 			position = path[-1].pos
 
 		if self.grib.getWindAt (time + datetime.timedelta(hours=1), end[0],end[1]):
-			if lastlog is None and len (lastlog.isochrones) > 0:
+			if lastlog is not None and len (lastlog.isochrones) > 0:
 				isoc = isoF(time + datetime.timedelta(hours=1), lastlog.isochrones, end)
 			else:
 				nwdist = utils.pointDistance (end[0], end[1], start[0], start[1])
@@ -54,10 +54,11 @@ class LinearBestIsoRouter (Router):
 			for p in isoc[-1]:
 				distance_to_end_point = p.pointDistance (end)
 				if distance_to_end_point < self.getParamValue('minIncrease'):
-					(twd,tws) = self.grib.getWindAt (time + datetime.timedelta(hours=1), p.pos[0], p.pos[1])
+					# (twd,tws) = self.grib.getWindAt (time + datetime.timedelta(hours=1), p.pos[0], p.pos[1])
 					maxReachDistance = utils.maxReachDistance(p.pos, p.speed)
 					if distance_to_end_point < abs(maxReachDistance*1.1):
-						if (not self.pointValidity or self.pointValidity(end[0],end[1])) and (not self.lineValidity or self.lineValidity(end[0],end[1], p.pos[0], p.pos[1])):
+						if (not self.pointValidity or self.pointValidity(end[0],end[1])) and (
+							not self.lineValidity or self.lineValidity(end[0],end[1], p.pos[0], p.pos[1])):
 							if distance_to_end_point < nearest_dist:
 								nearest_dist = distance_to_end_point
 								nearest_solution = p
