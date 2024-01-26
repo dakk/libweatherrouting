@@ -1,8 +1,8 @@
 # libweatherrouting
 
-[![Build Status](https://travis-ci.com/dakk/libweatherrouting.svg?branch=master)](https://travis-ci.com/dakk/libweatherrouting.svg?branch=master)
+![CI Status](https://github.com/dakk/libweatherrouting/actions/workflows/ci.yaml/badge.svg)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![PyPI version](https://badge.fury.io/py/weatherrouting.svg)](https://badge.fury.io/py/weatherrouting)
+![PyPI - Version](https://img.shields.io/pypi/v/weatherrouting)
 
 A 100% python weather routing library for sailing. 
 
@@ -12,7 +12,7 @@ An introductory explanation (english, french, spanish and italian translations) 
 
 ## Install
 
-`pip install git+https://github.com/dakk/libweatherrouting.git`
+`pip install weatherrouting`
 
 ## Usage
 
