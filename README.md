@@ -23,10 +23,10 @@ Almost one external function has to be implemented as a preliminary requirement 
 ### Wind direction and speed for a given location at specified time
 A function that accept a datetime item, a float latitude and float longitude as parameters, 
 performs a wind forecast analysis for the specified time and location (usually sampling a grib file)
-and returns a tuple with true wind direction (`twd`) expressed in radians and true wind speed (`tws`) expressed in meters per second or `None` if running out of temporal/geographic grib scope.
+and returns a tuple with true wind direction (`twd`) expressed in degrees and true wind speed (`tws`) expressed in meters per second or `None` if running out of temporal/geographic grib scope.
 
 ```python
-def getWindAt( t, lat, lon)
+def getWindAt(t, lat, lon)
     # wind forecast analysys implementation
     ...
     return (twd, tws)
