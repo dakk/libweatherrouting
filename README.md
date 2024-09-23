@@ -68,7 +68,7 @@ from datetime import datetime
 Define a list of trackpoints as lat,long tuples (almost 2) that have to be reached by the route
 
 ```python
-track = ((5.1, 38.1), (5.2, 38.4), (5.7, 38.2))
+track = ((38.1, 5.1), (38.4, 5.2), (38.2, 5.7))
 ```
 
 ### Define a polar wrapper
@@ -94,7 +94,7 @@ routing_obj = Routing(
     track,                          # the list of track points (lat,lon)
     getWindAt,                      # the function that returns (twd,tws) for a specified (datetime, lat, lon)
     start,                          # the start datetime
-    start_position = (4.8,37.8)     # the start location (lat lon, optional, the first track point if undefined)
+    start_position = (37.8, 4.8)    # the start location (lat lon, optional, the first track point if undefined)
     pointValidity = point_validity  # the point validity function (optional)
     lineValidity = line_validity    # the line validity function (optional)
 )
