@@ -105,8 +105,11 @@ Calculate subsequent steps until the end track point is reached
 
 ```python
 while not self.routing_obj.end:
-    res = self.routing_obj.step()
+    res = self.routing_obj.step() # default step duration is set to 1 hour
 
+# you can call a step with custom timedelta (in hour) at anytime
+while not self.routing_obj.end:
+    res = self.routing_obj.step(timedelta=0.25) # 15min time delta
 ```
 the step method returns a RoutingResult object with the following informations during routing calculation:
 ```python

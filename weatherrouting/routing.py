@@ -100,7 +100,7 @@ class Routing:
             self.wp = 1
             self.position = self.track[0]
 
-    def step(self) -> RoutingResult:
+    def step(self, timedelta=1) -> RoutingResult:
         """Execute a single routing step"""
         self.steps += 1
 
@@ -113,10 +113,14 @@ class Routing:
         nextwp = self.track[self.wp]
 
         if self._startingNewPoint or len(self.log) == 0:
-            res = self.algorithm.route(None, self.time, self.position, nextwp)
+            res = self.algorithm.route(
+                None, self.time, timedelta, self.position, nextwp
+            )
             self._startingNewPoint = False
         else:
-            res = self.algorithm.route(self.log[-1], self.time, self.position, nextwp)
+            res = self.algorithm.route(
+                self.log[-1], self.time, timedelta, self.position, nextwp
+            )
 
         # self.time += 0.2
         ff = 100 / len(self.track)

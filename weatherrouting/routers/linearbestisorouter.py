@@ -36,7 +36,7 @@ class LinearBestIsoRouter(Router):
         )
     }
 
-    def _route(self, lastlog, time, start, end, isoF):  # noqa: C901
+    def _route(self, lastlog, time, timedelta, start, end, isoF):  # noqa: C901
         position = start
         path = []
 
@@ -50,13 +50,21 @@ class LinearBestIsoRouter(Router):
             path = path[::-1]
             position = path[-1].pos
 
-        if self.grib.getWindAt(time + datetime.timedelta(hours=1), end[0], end[1]):
+        if self.grib.getWindAt(
+            time + datetime.timedelta(hours=timedelta), end[0], end[1]
+        ):
             if lastlog is not None and len(lastlog.isochrones) > 0:
-                isoc = isoF(time + datetime.timedelta(hours=1), lastlog.isochrones, end)
+                isoc = isoF(
+                    time + datetime.timedelta(hours=timedelta),
+                    timedelta,
+                    lastlog.isochrones,
+                    end,
+                )
             else:
                 nwdist = utils.pointDistance(end[0], end[1], start[0], start[1])
                 isoc = isoF(
-                    time + datetime.timedelta(hours=1),
+                    time + datetime.timedelta(hours=timedelta),
+                    timedelta,
                     [[IsoPoint((start[0], start[1]), time=time, nextWPDist=nwdist)]],
                     end,
                 )
@@ -66,7 +74,7 @@ class LinearBestIsoRouter(Router):
             for p in isoc[-1]:
                 distance_to_end_point = p.pointDistance(end)
                 if distance_to_end_point < self.getParamValue("minIncrease"):
-                    # (twd,tws) = self.grib.getWindAt (time + datetime.timedelta(hours=1),
+                    # (twd,tws) = self.grib.getWindAt (time + datetime.timedelta(hours=timedelta),
                     # p.pos[0], p.pos[1])
                     maxReachDistance = utils.maxReachDistance(p.pos, p.speed)
                     if distance_to_end_point < abs(maxReachDistance * 1.1):
@@ -94,11 +102,11 @@ class LinearBestIsoRouter(Router):
             generate_path(minP)
 
         return RoutingResult(
-            time=time + datetime.timedelta(hours=1),
+            time=time + datetime.timedelta(hours=timedelta),
             path=path,
             position=position,
             isochrones=isoc,
         )
 
-    def route(self, lastlog, t, start, end) -> RoutingResult:
-        return self._route(lastlog, t, start, end, self.calculateIsochrones)
+    def route(self, lastlog, t, timedelta, start, end) -> RoutingResult:
+        return self._route(lastlog, t, timedelta, start, end, self.calculateIsochrones)

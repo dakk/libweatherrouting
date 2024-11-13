@@ -114,3 +114,37 @@ class checkRoute_out_of_scope(unittest.TestCase):
 
         self.assertEqual(i, 4)
         self.assertEqual(not res.path, False)
+
+
+class TestRouting_custom_step(unittest.TestCase):
+    def setUp(self):
+        grib = mock_grib(2, 180, 0.1)
+        self.track = [(5, 38), (5.2, 38.2)]
+        island_route = mock_point_validity(self.track)
+        self.routing_obj = weatherrouting.Routing(
+            ShortestPathRouter,
+            None,
+            self.track,
+            grib,
+            datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
+            pointValidity=island_route.point_validity,
+        )
+
+    def test_step(self):
+        res = None
+        i = 0
+
+        while not self.routing_obj.end:
+            res = self.routing_obj.step(timedelta=0.5)
+            i += 1
+
+        self.assertEqual(i, 5)
+        self.assertEqual(not res.path, False)
+
+        path_to_end = res.path + [IsoPoint(self.track[-1])]
+        self.assertEqual(
+            res.time, datetime.datetime.fromisoformat("2021-04-02 14:00:00")
+        )
+        self.assertEqual(
+            len(json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))), 1783
+        )

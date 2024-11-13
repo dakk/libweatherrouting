@@ -43,13 +43,14 @@ class ShortestPathRouter(LinearBestIsoRouter):
         ),
     }
 
-    def route(self, lastlog, t, start, end) -> RoutingResult:
+    def route(self, lastlog, t, timedelta, start, end) -> RoutingResult:
         return self._route(
             lastlog,
             t,
+            timedelta,
             start,
             end,
-            lambda t, isoc, end: self.calculateShortestPathIsochrones(
-                self.getParamValue("fixedSpeed"), t, isoc, end
+            lambda t, dt, isoc, end: self.calculateShortestPathIsochrones(
+                self.getParamValue("fixedSpeed"), t, timedelta, isoc, end
             ),
         )
