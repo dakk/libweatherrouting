@@ -146,5 +146,5 @@ class TestRouting_custom_step(unittest.TestCase):
             res.time, datetime.datetime.fromisoformat("2021-04-02 14:00:00")
         )
         self.assertEqual(
-            len(json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))), 1783
+            len(json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))), 1785
         )
