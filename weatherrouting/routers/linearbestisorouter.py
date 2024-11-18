@@ -16,6 +16,7 @@
 # For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import datetime
+from typing import List
 
 from .. import utils
 from .router import IsoPoint, Router, RouterParam, RoutingResult
@@ -99,6 +100,28 @@ class LinearBestIsoRouter(Router):
             position=position,
             isochrones=isoc,
         )
+        
+    def get_current_best_path(self, lastlog, end) -> List:  # noqa: C901
+        path = []
+
+        def generate_path(p):
+            nonlocal path
+            nonlocal isoc
+            path.append(p)
+            for iso in isoc[::-1][1::]:
+                path.append(iso[path[-1].prevIdx])
+            path = path[::-1]
+
+        minDist = 1000000
+        isoc = lastlog.isochrones
+        for p in isoc[-1]:
+            checkDist = p.pointDistance(end)
+            if checkDist < minDist:
+                minDist = checkDist
+                minP = p
+        generate_path(minP)
+
+        return path
 
     def route(self, lastlog, t, start, end) -> RoutingResult:
         return self._route(lastlog, t, start, end, self.calculateIsochrones)

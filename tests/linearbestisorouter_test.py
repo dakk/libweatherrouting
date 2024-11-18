@@ -15,9 +15,11 @@
 # For detail about GNU see <http://www.gnu.org/licenses/>.
 import datetime
 import json
+import time
 import math
 import os
 import unittest
+from parameterized import parameterized
 
 import weatherrouting
 from weatherrouting.routers.linearbestisorouter import LinearBestIsoRouter
@@ -38,8 +40,7 @@ def heading(y, x):
 
 
 class TestRouting_straigth_upwind(unittest.TestCase):
-    def test_step(self):
-        base_step = [
+    @parameterized.expand([
             [1, 0],
             [1, 1],
             [0, 1],
@@ -48,38 +49,43 @@ class TestRouting_straigth_upwind(unittest.TestCase):
             [-1, -1],
             [0, -1],
             [1, -1],
-        ]
+        ])
+    def test_step(self, s0, s1):
         base_start = [34, 17]
         base_gjs = {}
 
-        for s in base_step:
-            base_end = [base_start[0] + s[0], base_start[1] + s[1]]
-            head = heading(*s)
-            print("TEST UPWIND TWD", head, "step", s)
-            pvmodel = mock_point_validity([base_start, base_end])
-            routing_obj = weatherrouting.Routing(
-                LinearBestIsoRouter,
-                polar_bavaria38,
-                [base_start, base_end],
-                mock_grib(10, head, 0),
-                datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
-                lineValidity=pvmodel.line_validity,
-            )
-            res = None
-            i = 0
+        base_end = [base_start[0] + s0, base_start[1] + s1]
+        head = heading(s0, s1)
+        print("TEST UPWIND TWD", head, "step", s0,s1)
+        pvmodel = mock_point_validity([base_start, base_end])
+        routing_obj = weatherrouting.Routing(
+            LinearBestIsoRouter,
+            polar_bavaria38,
+            [base_start, base_end],
+            mock_grib(10, head, 0),
+            datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
+            lineValidity=pvmodel.line_validity,
+        )
+        res = None
+        i = 0
 
-            while not routing_obj.end:
-                res = routing_obj.step()
-                i += 1
+        ptime = time.time()
+        while not routing_obj.end:
+            res = routing_obj.step()
+            i += 1
+            ntime = time.time()
+            print(i, ntime-ptime, res.path,'\n')
+            print(routing_obj.get_current_best_path(), '\n')
+            ptime = ntime
 
-            path_to_end = res.path
-            if not base_gjs:
-                base_gjs = weatherrouting.utils.pathAsGeojson(path_to_end)
-            else:
-                base_gjs["features"] += weatherrouting.utils.pathAsGeojson(path_to_end)[
-                    "features"
-                ]
-            gjs = json.dumps(base_gjs)
+        path_to_end = res.path
+        if not base_gjs:
+            base_gjs = weatherrouting.utils.pathAsGeojson(path_to_end)
+        else:
+            base_gjs["features"] += weatherrouting.utils.pathAsGeojson(path_to_end)[
+                "features"
+            ]
+        gjs = json.dumps(base_gjs)
 
         print(gjs)
 

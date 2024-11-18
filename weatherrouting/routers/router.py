@@ -17,7 +17,8 @@
 
 import math
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Dict, NamedTuple, Optional, Tuple
+from dataclasses import dataclass
+from typing import Any, Dict, Optional, Tuple
 
 from .. import utils
 
@@ -75,7 +76,8 @@ class RoutingResult:
         # position=%s, self.position,
 
 
-class IsoPoint(NamedTuple):
+@dataclass
+class IsoPoint:
     pos: Tuple[float, float]
     prevIdx: int = -1
     time: Optional[float] = None
