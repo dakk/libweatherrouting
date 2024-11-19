@@ -153,7 +153,7 @@ class Router:
     def getParamValue(self, code):
         return self.PARAMS[code].value
 
-    def calculateShortestPathIsochrones(self, fixedSpeed, t, isocrone, nextwp):
+    def calculateShortestPathIsochrones(self, fixedSpeed, t, dt, isocrone, nextwp):
         """Calculates isochrones based on shortest path at fixed speed (motoring);
         the speed considers reductions / increases derived from leeway"""
 
@@ -167,9 +167,9 @@ class Router:
                 speed,
             )
 
-        return self._calculateIsochronesConcurrent(t, isocrone, nextwp, pointF)
+        return self._calculateIsochronesConcurrent(t, dt, isocrone, nextwp, pointF)
 
-    def calculateIsochrones(self, t, isocrone, nextwp):
+    def calculateIsochrones(self, t, dt, isocrone, nextwp):
         """Calculate isochrones depending on routageSpeed from polar"""
 
         def pointF(p, tws, twa, dt, brg):
@@ -184,7 +184,7 @@ class Router:
             # math.degrees(brg), 'rpd', rpd)
             return rpd
 
-        return self._calculateIsochronesConcurrent(t, isocrone, nextwp, pointF)
+        return self._calculateIsochronesConcurrent(t, dt, isocrone, nextwp, pointF)
 
     def _filterValidity(self, isonew, last):  # noqa: C901
         def validPoint(a):
@@ -232,9 +232,8 @@ class Router:
 
         return isonew
 
-    def _calculateIsochronesConcurrent(self, t, isocrone, nextwp, pointF):
+    def _calculateIsochronesConcurrent(self, t, dt, isocrone, nextwp, pointF):
         """Calcuates isochrones based on pointF next point calculation"""
-        dt = 1.0 / 60.0 * 60.0
         last = isocrone[-1]
 
         newisopoints = []
@@ -313,9 +312,8 @@ class Router:
 
         return isocrone
 
-    def _calculateIsochrones(self, t, isocrone, nextwp, pointF):
+    def _calculateIsochrones(self, t, dt, isocrone, nextwp, pointF):
         """Calcuates isochrones based on pointF next point calculation"""
-        dt = 1.0 / 60.0 * 60.0
         last = isocrone[-1]
 
         newisopoints = []
@@ -390,5 +388,5 @@ class Router:
         at current speed / angle"""
         return speed * math.cos(angle)
 
-    def route(self, lastlog, t, start, end) -> RoutingResult:
+    def route(self, lastlog, t, timedelta, start, end) -> RoutingResult:
         raise Exception("Not implemented")
