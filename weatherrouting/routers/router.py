@@ -264,7 +264,9 @@ class Router:
 
         return isonew
 
-    def _calculateIsochrones(self, t, dt, isocrone, nextwp, pointF, subdiv):  # noqa: C901
+    def _calculateIsochrones(  # noqa: C901
+        self, t, dt, isocrone, nextwp, pointF, subdiv
+    ):
         """Calcuates isochrones based on pointF next point calculation"""
         last = isocrone[-1]
 

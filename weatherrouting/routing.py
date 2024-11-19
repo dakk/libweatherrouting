@@ -106,7 +106,6 @@ class Routing:
         last_wp = (self.wp - 1) if self.wp >= len(self.track) else self.wp
         return self.algorithm.get_current_best_path(self.log[-1], self.track[last_wp])
 
-
     def step(self, timedelta=1) -> RoutingResult:
         """Execute a single routing step"""
         self.steps += 1
