@@ -18,7 +18,7 @@ from .linearbestisorouter import LinearBestIsoRouter, RouterParam, RoutingResult
 
 
 class ShortestPathRouter(LinearBestIsoRouter):
-    PARAMS = LinearBestIsoRouter.PARAMS | {
+    PARAMS = { **LinearBestIsoRouter.PARAMS, 
         "fixedSpeed": RouterParam(
             "fixedSpeed",
             "Fixed speed (kn)",

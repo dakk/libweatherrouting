@@ -23,7 +23,7 @@ from .router import IsoPoint, Router, RouterParam, RoutingResult
 
 
 class LinearBestIsoRouter(Router):
-    PARAMS = Router.PARAMS | {
+    PARAMS = { **Router.PARAMS,
         "minIncrease": RouterParam(
             "minIncrease",
             "Minimum increase (nm)",
