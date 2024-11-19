@@ -23,7 +23,8 @@ from .router import IsoPoint, Router, RouterParam, RoutingResult
 
 
 class LinearBestIsoRouter(Router):
-    PARAMS = { **Router.PARAMS,
+    PARAMS = {
+        **Router.PARAMS,
         "minIncrease": RouterParam(
             "minIncrease",
             "Minimum increase (nm)",
@@ -34,7 +35,7 @@ class LinearBestIsoRouter(Router):
             upper=100.0,
             step=0.1,
             digits=1,
-        )
+        ),
     }
 
     def _route(self, lastlog, time, timedelta, start, end, isoF):  # noqa: C901
