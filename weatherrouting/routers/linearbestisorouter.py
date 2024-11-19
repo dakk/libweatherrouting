@@ -23,7 +23,7 @@ from .router import IsoPoint, Router, RouterParam, RoutingResult
 
 
 class LinearBestIsoRouter(Router):
-    PARAMS = {
+    PARAMS = Router.PARAMS | {
         "minIncrease": RouterParam(
             "minIncrease",
             "Minimum increase (nm)",
@@ -100,7 +100,7 @@ class LinearBestIsoRouter(Router):
             position=position,
             isochrones=isoc,
         )
-        
+
     def get_current_best_path(self, lastlog, end) -> List:  # noqa: C901
         path = []
 

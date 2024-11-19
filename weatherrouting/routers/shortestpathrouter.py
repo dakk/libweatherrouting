@@ -18,18 +18,7 @@ from .linearbestisorouter import LinearBestIsoRouter, RouterParam, RoutingResult
 
 
 class ShortestPathRouter(LinearBestIsoRouter):
-    PARAMS = {
-        "minIncrease": RouterParam(
-            "minIncrease",
-            "Minimum increase (nm)",
-            "float",
-            "Set the minimum value for selecting a new valid point",
-            default=10.0,
-            lower=1.0,
-            upper=100.0,
-            step=0.1,
-            digits=1,
-        ),
+    PARAMS = LinearBestIsoRouter.PARAMS | {
         "fixedSpeed": RouterParam(
             "fixedSpeed",
             "Fixed speed (kn)",
