@@ -180,7 +180,7 @@ class Router:
             raise Exception(f"Invalid param: {code}")
         return self.PARAMS[code].value
 
-    def calculateShortestPathIsochrones(self, fixedSpeed, t, isocrone, nextwp):
+    def calculateShortestPathIsochrones(self, fixedSpeed, t, dt, isocrone, nextwp):
         """Calculates isochrones based on shortest path at fixed speed (motoring);
         the speed considers reductions / increases derived from leeway"""
 
@@ -195,10 +195,10 @@ class Router:
             )
 
         return self._calculateIsochrones(
-            t, isocrone, nextwp, pointF, self.getParamValue("subdiv")
+            t, dt, isocrone, nextwp, pointF, self.getParamValue("subdiv")
         )
 
-    def calculateIsochrones(self, t, isocrone, nextwp):
+    def calculateIsochrones(self, t, dt, isocrone, nextwp):
         """Calculate isochrones depending on routageSpeed from polar"""
 
         def pointF(p, tws, twa, dt, brg):
@@ -215,7 +215,7 @@ class Router:
             return rpd
 
         return self._calculateIsochrones(
-            t, isocrone, nextwp, pointF, self.getParamValue("subdiv")
+            t, dt, isocrone, nextwp, pointF, self.getParamValue("subdiv")
         )
 
     def _filterValidity(self, isonew, last):  # noqa: C901
@@ -264,9 +264,8 @@ class Router:
 
         return isonew
 
-    def _calculateIsochrones(self, t, isocrone, nextwp, pointF, subdiv):  # noqa: C901
+    def _calculateIsochrones(self, t, dt, isocrone, nextwp, pointF, subdiv):  # noqa: C901
         """Calcuates isochrones based on pointF next point calculation"""
-        dt = 1.0 / 60.0 * 60.0
         last = isocrone[-1]
 
         newisopoints = []
@@ -358,5 +357,5 @@ class Router:
         at current speed / angle"""
         return speed * math.cos(angle)
 
-    def route(self, lastlog, t, start, end) -> RoutingResult:
+    def route(self, lastlog, t, timedelta, start, end) -> RoutingResult:
         raise Exception("Not implemented")

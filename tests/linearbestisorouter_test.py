@@ -206,7 +206,7 @@ class checkRoute_highWind_mockIsland_3(unittest.TestCase):
             res = self.routing_obj.step()
             i += 1
 
-        self.assertEqual(i, 9)
+        self.assertEqual(i, 10)
         self.assertEqual(not res.path, False)
 
 
@@ -263,4 +263,30 @@ class checkRoute_multipoint(unittest.TestCase):
             i += 1
 
         self.assertEqual(i, 5)
+        self.assertEqual(not res.path, False)
+
+
+class TestRouting_custom_step(unittest.TestCase):
+    def setUp(self):
+        grib = mock_grib(2, 180, 0.1)
+        self.track = [(5, 38), (5.2, 38.2)]
+        island_route = mock_point_validity(self.track, factor=5)
+        self.routing_obj = weatherrouting.Routing(
+            LinearBestIsoRouter,
+            polar_bavaria38,
+            self.track,
+            grib,
+            datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
+            pointValidity=island_route.point_validity,
+        )
+
+    def test_step(self):
+        res = None
+        i = 0
+
+        while not self.routing_obj.end:
+            res = self.routing_obj.step(timedelta=0.5)
+            i += 1
+
+        self.assertEqual(i, 14)
         self.assertEqual(not res.path, False)
