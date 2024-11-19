@@ -12,6 +12,8 @@
 # GNU General Public License for more details.
 
 # For detail about GNU see <http://www.gnu.org/licenses/>.
+from typing import List
+
 from .routers import RoutingResult, linearbestisorouter
 
 
@@ -99,6 +101,10 @@ class Routing:
         else:
             self.wp = 1
             self.position = self.track[0]
+
+    def get_current_best_path(self) -> List:
+        last_wp = (self.wp - 1) if self.wp >= len(self.track) else self.wp
+        return self.algorithm.get_current_best_path(self.log[-1], self.track[last_wp])
 
     def step(self, timedelta=1) -> RoutingResult:
         """Execute a single routing step"""

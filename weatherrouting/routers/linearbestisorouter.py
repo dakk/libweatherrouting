@@ -16,6 +16,7 @@
 # For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import datetime
+from typing import List
 
 from .. import utils
 from .router import IsoPoint, Router, RouterParam, RoutingResult
@@ -23,6 +24,7 @@ from .router import IsoPoint, Router, RouterParam, RoutingResult
 
 class LinearBestIsoRouter(Router):
     PARAMS = {
+        **Router.PARAMS,
         "minIncrease": RouterParam(
             "minIncrease",
             "Minimum increase (nm)",
@@ -33,7 +35,7 @@ class LinearBestIsoRouter(Router):
             upper=100.0,
             step=0.1,
             digits=1,
-        )
+        ),
     }
 
     def _route(self, lastlog, time, timedelta, start, end, isoF):  # noqa: C901
@@ -107,6 +109,28 @@ class LinearBestIsoRouter(Router):
             position=position,
             isochrones=isoc,
         )
+
+    def get_current_best_path(self, lastlog, end) -> List:  # noqa: C901
+        path = []
+
+        def generate_path(p):
+            nonlocal path
+            nonlocal isoc
+            path.append(p)
+            for iso in isoc[::-1][1::]:
+                path.append(iso[path[-1].prevIdx])
+            path = path[::-1]
+
+        minDist = 1000000
+        isoc = lastlog.isochrones
+        for p in isoc[-1]:
+            checkDist = p.pointDistance(end)
+            if checkDist < minDist:
+                minDist = checkDist
+                minP = p
+        generate_path(minP)
+
+        return path
 
     def route(self, lastlog, t, timedelta, start, end) -> RoutingResult:
         return self._route(lastlog, t, timedelta, start, end, self.calculateIsochrones)
