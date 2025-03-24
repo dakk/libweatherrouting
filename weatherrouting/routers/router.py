@@ -174,9 +174,11 @@ class Router:
 
         def pointF(p, tws, twa, dt, brg):
             speed = self.polar.getSpeed(tws, math.copysign(twa, 1))
+            # Issue 19 : for routagePointDistance defaut distance unit is nm 
+            #  speed*dt is nm  (don't convert in km) 
             rpd = (
                 utils.routagePointDistance(
-                    p[0], p[1], speed * dt * utils.NAUTICAL_MILE_IN_KM, brg
+                    p[0], p[1], speed * dt , brg
                 ),
                 speed,
             )
@@ -249,6 +251,8 @@ class Router:
                 raise RoutingNoWindException() from e
             # Isssue 18: convert only once twd from degrees to radians 
             twd = math.radians(twd)
+             # issue 19: convert speed to knots 
+            tws=utils.MS2KT*tws 
             for twa in range(-180, 180, 5):
                 twa = math.radians(twa)
                 brg = utils.reduce360(twd + twa)
@@ -328,6 +332,8 @@ class Router:
                 raise RoutingNoWindException() from e
             # Issue 18 : convert only once twd from degrees to radians 
             twd = math.radians(twd)
+             # issue 19: convert speed to knots 
+            tws=utils.MS2KT*tws 
             for twa in range(-180, 180, 5):
                 twa = math.radians(twa)
                 brg = utils.reduce360(twd + twa)
