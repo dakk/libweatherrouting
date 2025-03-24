@@ -247,10 +247,10 @@ class Router:
                 (twd, tws) = self.grib.getWindAt(t, p.pos[0], p.pos[1])
             except Exception as e:
                 raise RoutingNoWindException() from e
-
+            # Isssue 18: convert only once twd from degrees to radians 
+            twd = math.radians(twd)
             for twa in range(-180, 180, 5):
                 twa = math.radians(twa)
-                twd = math.radians(twd)
                 brg = utils.reduce360(twd + twa)
 
                 # Calculate next point
@@ -326,10 +326,10 @@ class Router:
                 (twd, tws) = self.grib.getWindAt(t, p.pos[0], p.pos[1])
             except Exception as e:
                 raise RoutingNoWindException() from e
-
+            # Issue 18 : convert only once twd from degrees to radians 
+            twd = math.radians(twd)
             for twa in range(-180, 180, 5):
                 twa = math.radians(twa)
-                twd = math.radians(twd)
                 brg = utils.reduce360(twd + twa)
 
                 # Calculate next point
