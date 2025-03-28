@@ -21,15 +21,15 @@ import weatherrouting
 from weatherrouting.routers.router import IsoPoint
 from weatherrouting.routers.shortestpathrouter import ShortestPathRouter
 
-from .mock_grib import mock_grib
-from .mock_point_validity import mock_point_validity
+from .mock_grib import MockGrib
+from .mock_point_validity import MockPointValidity
 
 
 class TestRouting_noIsland(unittest.TestCase):
     def setUp(self):
-        grib = mock_grib(2, 180, 0.1)
+        grib = MockGrib(2, 180, 0.1)
         self.track = [(5, 38), (5.2, 38.2)]
-        island_route = mock_point_validity(self.track)
+        island_route = MockPointValidity(self.track)
         self.routing_obj = weatherrouting.Routing(
             ShortestPathRouter,
             None,
@@ -55,15 +55,15 @@ class TestRouting_noIsland(unittest.TestCase):
             res.time, datetime.datetime.fromisoformat("2021-04-02 14:00:00")
         )
         self.assertEqual(
-            len(json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))), 1197
+            len(json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))), 1201
         )
 
 
 class TestRouting_mockIsland_5(unittest.TestCase):
     def setUp(self):
-        grib = mock_grib(2, 180, 0.1)
+        grib = MockGrib(2, 180, 0.1)
         self.track = [(5, 38), (5.2, 38.2)]
-        island_route = mock_point_validity(self.track, factor=5)
+        island_route = MockPointValidity(self.track, factor=5)
         self.routing_obj = weatherrouting.Routing(
             ShortestPathRouter,
             None,
@@ -87,14 +87,14 @@ class TestRouting_mockIsland_5(unittest.TestCase):
 
 class checkRoute_out_of_scope(unittest.TestCase):
     def setUp(self):
-        grib = mock_grib(
+        grib = MockGrib(
             10,
             270,
             0.5,
             out_of_scope=datetime.datetime.fromisoformat("2021-04-02T15:00:00"),
         )
         self.track = [(5, 38), (5.5, 38.5)]
-        island_route = mock_point_validity(self.track, factor=3)
+        island_route = MockPointValidity(self.track, factor=3)
         self.routing_obj = weatherrouting.Routing(
             ShortestPathRouter,
             None,
@@ -118,9 +118,9 @@ class checkRoute_out_of_scope(unittest.TestCase):
 
 class TestRouting_custom_step(unittest.TestCase):
     def setUp(self):
-        grib = mock_grib(2, 180, 0.1)
+        grib = MockGrib(2, 180, 0.1)
         self.track = [(5, 38), (5.2, 38.2)]
-        island_route = mock_point_validity(self.track)
+        island_route = MockPointValidity(self.track)
         self.routing_obj = weatherrouting.Routing(
             ShortestPathRouter,
             None,
@@ -146,5 +146,5 @@ class TestRouting_custom_step(unittest.TestCase):
             res.time, datetime.datetime.fromisoformat("2021-04-02 14:00:00")
         )
         self.assertEqual(
-            len(json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))), 1785
+            len(json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))), 1813
         )

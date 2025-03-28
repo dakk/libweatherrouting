@@ -22,7 +22,7 @@ class Grib:
 
     def getWindAt(self, t: float, lat: float, lon: float) -> Tuple[float, float]:
         """
-        Returns (twd: degree, tws: knots) for the given point (lat, lon) at time t
+        Returns (twd: degree, tws: m/s) for the given point (lat, lon) at time t
         or None if running out of temporal/geographic grib scope
         """
         raise Exception("Not implemented")

@@ -25,7 +25,12 @@ import latlon
 EARTH_RADIUS = 60.0 * 360 / (2 * math.pi)  # nm
 NAUTICAL_MILE_IN_KM = 1.852
 # Speed conversion m/s to kt
-MS2KT=1.94384
+MS2KT = 1.94384
+
+
+def ms_to_knots(v: float) -> float:
+    return v * MS2KT
+
 
 def cfbinomiale(n: int, i: int) -> float:
     return math.factorial(n) / (math.factorial(n - i) * math.factorial(i))

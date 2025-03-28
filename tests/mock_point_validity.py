@@ -15,7 +15,7 @@
 import weatherrouting
 
 
-class mock_point_validity:
+class MockPointValidity:
     def __init__(self, track, factor=4):
         self.mean_point = (
             (track[0][1] + track[1][1]) / 2,

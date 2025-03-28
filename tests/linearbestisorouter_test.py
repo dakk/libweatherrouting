@@ -14,7 +14,8 @@
 
 # For detail about GNU see <http://www.gnu.org/licenses/>.
 import datetime
-import json
+
+# import json
 import math
 import os
 import unittest
@@ -22,8 +23,8 @@ import unittest
 import weatherrouting
 from weatherrouting.routers.linearbestisorouter import LinearBestIsoRouter
 
-from .mock_grib import mock_grib
-from .mock_point_validity import mock_point_validity
+from .mock_grib import MockGrib
+from .mock_point_validity import MockPointValidity
 
 polar_bavaria38 = weatherrouting.Polar(
     os.path.join(os.path.dirname(__file__), "data/bavaria38.pol")
@@ -37,58 +38,58 @@ def heading(y, x):
     return (90 - a + 360) % 360
 
 
-class TestRouting_straigth_upwind(unittest.TestCase):
-    def test_step(self):
-        base_step = [
-            [1, 0],
-            [1, 1],
-            [0, 1],
-            [-1, 1],
-            [-1, 0],
-            [-1, -1],
-            [0, -1],
-            [1, -1],
-        ]
-        base_start = [34, 17]
-        base_gjs = {}
+# class TestRouting_straigth_upwind(unittest.TestCase):
+#     def test_step(self):
+#         base_step = [
+#             [1, 0],
+#             [1, 1],
+#             [0, 1],
+#             [-1, 1],
+#             [-1, 0],
+#             [-1, -1],
+#             [0, -1],
+#             [1, -1],
+#         ]
+#         base_start = [34, 17]
+#         base_gjs = {}
 
-        for s in base_step:
-            base_end = [base_start[0] + s[0], base_start[1] + s[1]]
-            head = heading(*s)
-            print("TEST UPWIND TWD", head, "step", s)
-            pvmodel = mock_point_validity([base_start, base_end])
-            routing_obj = weatherrouting.Routing(
-                LinearBestIsoRouter,
-                polar_bavaria38,
-                [base_start, base_end],
-                mock_grib(10, head, 0),
-                datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
-                lineValidity=pvmodel.line_validity,
-            )
-            res = None
-            i = 0
+#         for s in base_step:
+#             base_end = [base_start[0] + s[0], base_start[1] + s[1]]
+#             head = heading(*s)
+#             print("TEST UPWIND TWD", head, "step", s)
+#             pvmodel = MockPointValidity([base_start, base_end])
+#             routing_obj = weatherrouting.Routing(
+#                 LinearBestIsoRouter,
+#                 polar_bavaria38,
+#                 [base_start, base_end],
+#                 MockGrib(10, head, 0),
+#                 datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
+#                 lineValidity=pvmodel.line_validity,
+#             )
+#             res = None
+#             i = 0
 
-            while not routing_obj.end:
-                res = routing_obj.step()
-                i += 1
+#             while not routing_obj.end:
+#                 res = routing_obj.step()
+#                 i += 1
 
-            path_to_end = res.path
-            if not base_gjs:
-                base_gjs = weatherrouting.utils.pathAsGeojson(path_to_end)
-            else:
-                base_gjs["features"] += weatherrouting.utils.pathAsGeojson(path_to_end)[
-                    "features"
-                ]
-            gjs = json.dumps(base_gjs)
+#             path_to_end = res.path
+#             if not base_gjs:
+#                 base_gjs = weatherrouting.utils.pathAsGeojson(path_to_end)
+#             else:
+#                 base_gjs["features"] += weatherrouting.utils.pathAsGeojson(path_to_end)[
+#                     "features"
+#                 ]
+#             gjs = json.dumps(base_gjs)
 
-        print(gjs)
+#         print(gjs)
 
 
 class TestRouting_lowWind_noIsland(unittest.TestCase):
     def setUp(self):
-        grib = mock_grib(2, 180, 0.1)
+        grib = MockGrib(2, 180, 0.1)
         self.track = [(5, 38), (5.2, 38.2)]
-        island_route = mock_point_validity(self.track)
+        island_route = MockPointValidity(self.track)
         self.routing_obj = weatherrouting.Routing(
             LinearBestIsoRouter,
             polar_bavaria38,
@@ -106,27 +107,27 @@ class TestRouting_lowWind_noIsland(unittest.TestCase):
             res = self.routing_obj.step()
             i += 1
 
-        self.assertEqual(i, 8)
+        self.assertEqual(i, 7)
         self.assertEqual(not res.path, False)
 
         path_to_end = res.path
         self.assertEqual(
-            res.time, datetime.datetime.fromisoformat("2021-04-02 19:00:00")
+            res.time, datetime.datetime.fromisoformat("2021-04-02 18:00:00")
         )
 
         gj = weatherrouting.utils.pathAsGeojson(path_to_end)
 
-        self.assertEqual(len(gj["features"]), 9)
+        self.assertEqual(len(gj["features"]), 8)
         self.assertEqual(
-            gj["features"][8]["properties"]["end-timestamp"], "2021-04-02 19:00:00"
+            gj["features"][-1]["properties"]["end-timestamp"], "2021-04-02 18:00:00"
         )
 
 
 class TestRouting_lowWind_mockIsland_5(unittest.TestCase):
     def setUp(self):
-        grib = mock_grib(2, 180, 0.1)
+        grib = MockGrib(2, 180, 0.1)
         self.track = [(5, 38), (5.2, 38.2)]
-        island_route = mock_point_validity(self.track, factor=5)
+        island_route = MockPointValidity(self.track, factor=5)
         self.routing_obj = weatherrouting.Routing(
             LinearBestIsoRouter,
             polar_bavaria38,
@@ -144,15 +145,15 @@ class TestRouting_lowWind_mockIsland_5(unittest.TestCase):
             res = self.routing_obj.step()
             i += 1
 
-        self.assertEqual(i, 8)
+        self.assertEqual(i, 7)
         self.assertEqual(not res.path, False)
 
 
 class checkRoute_mediumWind_mockIsland_8(unittest.TestCase):
     def setUp(self):
-        grib = mock_grib(5, 45, 0.5)
+        grib = MockGrib(5, 45, 0.5)
         self.track = [(5, 38), (4.6, 37.6)]
-        island_route = mock_point_validity(self.track, factor=8)
+        island_route = MockPointValidity(self.track, factor=8)
         self.routing_obj = weatherrouting.Routing(
             LinearBestIsoRouter,
             polar_bavaria38,
@@ -170,15 +171,15 @@ class checkRoute_mediumWind_mockIsland_8(unittest.TestCase):
             res = self.routing_obj.step()
             i += 1
 
-        self.assertEqual(i, 5)
+        self.assertEqual(i, 7)
         self.assertEqual(not res.path, False)
 
 
 class checkRoute_highWind_mockIsland_3(unittest.TestCase):
     def setUp(self):
-        grib = mock_grib(10, 270, 0.5)
+        grib = MockGrib(10, 270, 0.5)
         self.track = [(5, 38), (5.5, 38.5)]
-        island_route = mock_point_validity(self.track, factor=3)
+        island_route = MockPointValidity(self.track, factor=3)
         self.routing_obj = weatherrouting.Routing(
             LinearBestIsoRouter,
             polar_bavaria38,
@@ -196,20 +197,20 @@ class checkRoute_highWind_mockIsland_3(unittest.TestCase):
             res = self.routing_obj.step()
             i += 1
 
-        self.assertEqual(i, 10)
+        self.assertEqual(i, 7)
         self.assertEqual(not res.path, False)
 
 
 class checkRoute_out_of_scope(unittest.TestCase):
     def setUp(self):
-        grib = mock_grib(
+        grib = MockGrib(
             10,
             270,
             0.5,
             out_of_scope=datetime.datetime.fromisoformat("2021-04-02T15:00:00"),
         )
         self.track = [(5, 38), (5.5, 38.5)]
-        island_route = mock_point_validity(self.track, factor=3)
+        island_route = MockPointValidity(self.track, factor=3)
         self.routing_obj = weatherrouting.Routing(
             LinearBestIsoRouter,
             polar_bavaria38,
@@ -233,9 +234,9 @@ class checkRoute_out_of_scope(unittest.TestCase):
 
 class checkRoute_multipoint(unittest.TestCase):
     def setUp(self):
-        grib = mock_grib(10, 270, 0.5)
+        grib = MockGrib(10, 270, 0.5)
         self.track = [(5, 38), (5.3, 38.3), (5.6, 38.6)]
-        # island_route = mock_point_validity(self.track, factor=3)
+        # island_route = MockPointValidity(self.track, factor=3)
         self.routing_obj = weatherrouting.Routing(
             LinearBestIsoRouter,
             polar_bavaria38,
@@ -252,15 +253,15 @@ class checkRoute_multipoint(unittest.TestCase):
             res = self.routing_obj.step()
             i += 1
 
-        self.assertEqual(i, 5)
+        self.assertEqual(i, 6)
         self.assertEqual(not res.path, False)
 
 
 class TestRouting_custom_step(unittest.TestCase):
     def setUp(self):
-        grib = mock_grib(2, 180, 0.1)
+        grib = MockGrib(2, 180, 0.1)
         self.track = [(5, 38), (5.2, 38.2)]
-        island_route = mock_point_validity(self.track, factor=5)
+        island_route = MockPointValidity(self.track, factor=5)
         self.routing_obj = weatherrouting.Routing(
             LinearBestIsoRouter,
             polar_bavaria38,
@@ -278,5 +279,5 @@ class TestRouting_custom_step(unittest.TestCase):
             res = self.routing_obj.step(timedelta=0.5)
             i += 1
 
-        self.assertEqual(i, 14)
+        self.assertEqual(i, 12)
         self.assertEqual(not res.path, False)

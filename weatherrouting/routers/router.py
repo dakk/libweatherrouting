@@ -154,7 +154,7 @@ class Router:
         return self.PARAMS[code].value
 
     def calculateShortestPathIsochrones(self, fixedSpeed, t, dt, isocrone, nextwp):
-        """Calculates isochrones based on shortest path at fixed speed (motoring);
+        """Calculates isochrones based on shortest path at fixed speed in knots (motoring);
         the speed considers reductions / increases derived from leeway"""
 
         def pointF(p, tws, twa, dt, brg):
@@ -167,26 +167,24 @@ class Router:
                 speed,
             )
 
-        return self._calculateIsochronesConcurrent(t, dt, isocrone, nextwp, pointF)
+        return self._calculateIsochrones(t, dt, isocrone, nextwp, pointF)
 
     def calculateIsochrones(self, t, dt, isocrone, nextwp):
         """Calculate isochrones depending on routageSpeed from polar"""
 
         def pointF(p, tws, twa, dt, brg):
             speed = self.polar.getSpeed(tws, math.copysign(twa, 1))
-            # Issue 19 : for routagePointDistance defaut distance unit is nm 
-            #  speed*dt is nm  (don't convert in km) 
+            # Issue 19 : for routagePointDistance defaut distance unit is nm
+            #  speed*dt is nm  (don't convert in km)
             rpd = (
-                utils.routagePointDistance(
-                    p[0], p[1], speed * dt , brg
-                ),
+                utils.routagePointDistance(p[0], p[1], speed * dt, brg),
                 speed,
             )
             # print ('tws', tws, 'sog', speed, 'twa', math.degrees(twa), 'brg',
             # math.degrees(brg), 'rpd', rpd)
             return rpd
 
-        return self._calculateIsochronesConcurrent(t, dt, isocrone, nextwp, pointF)
+        return self._calculateIsochrones(t, dt, isocrone, nextwp, pointF)
 
     def _filterValidity(self, isonew, last):  # noqa: C901
         def validPoint(a):
@@ -249,10 +247,10 @@ class Router:
                 (twd, tws) = self.grib.getWindAt(t, p.pos[0], p.pos[1])
             except Exception as e:
                 raise RoutingNoWindException() from e
-            # Isssue 18: convert only once twd from degrees to radians 
+
             twd = math.radians(twd)
-             # issue 19: convert speed to knots 
-            tws=utils.MS2KT*tws 
+            tws = utils.ms_to_knots(tws)
+
             for twa in range(-180, 180, 5):
                 twa = math.radians(twa)
                 brg = utils.reduce360(twd + twa)
@@ -330,10 +328,10 @@ class Router:
                 (twd, tws) = self.grib.getWindAt(t, p.pos[0], p.pos[1])
             except Exception as e:
                 raise RoutingNoWindException() from e
-            # Issue 18 : convert only once twd from degrees to radians 
+
             twd = math.radians(twd)
-             # issue 19: convert speed to knots 
-            tws=utils.MS2KT*tws 
+            tws = utils.ms_to_knots(tws)
+
             for twa in range(-180, 180, 5):
                 twa = math.radians(twa)
                 brg = utils.reduce360(twd + twa)

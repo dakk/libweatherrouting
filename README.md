@@ -28,6 +28,7 @@ and returns a tuple with true wind direction (`twd`) expressed in degrees and tr
 ```python
 def getWindAt(t, lat, lon)
     # wind forecast analysys implementation
+    # speed is in m/s, direction in degrees
     ...
     return (twd, tws)
 ```

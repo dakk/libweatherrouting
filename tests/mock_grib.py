@@ -14,10 +14,17 @@
 # For detail about GNU see <http://www.gnu.org/licenses/>.
 import datetime
 import random
+from typing import Optional, Tuple
 
 
-class mock_grib:
+class MockGrib:
     def __init__(self, starttws, starttwd, fuzziness, out_of_scope=None):
+        """
+        Params:
+            starttws: start wind speed in m/s
+            starttwd: start wind direction in degree
+            fuzziness: randomness factor
+        """
         self.starttws = starttws
         self.starttwd = starttwd
         self.fuzziness = fuzziness
@@ -40,7 +47,10 @@ class mock_grib:
             random.random() * self.fuzziness - self.fuzziness / 2
         )
 
-    def getWindAt(self, t, lat, lon):
+    def getWindAt(self, t, lat, lon) -> Optional[Tuple[float, float]]:
+        """
+        Returns a tuple containing direction in degree and speed in m/s
+        """
         if not self.out_of_scope or t < self.out_of_scope:
             return (
                 self.twd_var(t),
