@@ -18,7 +18,7 @@ setup(
     name="weatherrouting",
     version="0.1.13",
     description="Weather routing library for sailing",
-    author=["Davide Gessa"],
+    author="Davide Gessa",
     setup_requires="setuptools",
     author_email="gessadavide@gmail.com",
     packages=["weatherrouting", "weatherrouting.routers"],
