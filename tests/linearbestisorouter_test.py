@@ -124,7 +124,7 @@ class TestRouting_lowWind_noIsland(unittest.TestCase):
         #     res.time, datetime.datetime.fromisoformat("2021-04-02 19:00:00")
         # )
 
-        gj = weatherrouting.utils.pathAsGeojson(path_to_end) # noqa: F841
+        gj = weatherrouting.utils.pathAsGeojson(path_to_end)  # noqa: F841
 
         # self.assertEqual(len(gj["features"]), 9)
         # self.assertEqual(
