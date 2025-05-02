@@ -12,4 +12,4 @@
 # GNU General Public License for more details.
 
 # For detail about GNU see <http://www.gnu.org/licenses/>.
-from .router import IsoPoint, RoutingNoWindException, RoutingResult  # noqa: F401
+from .router import IsoPoint, RoutingNoWindError, RoutingResult  # noqa: F401

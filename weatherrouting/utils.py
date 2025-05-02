@@ -33,12 +33,14 @@ def ms_to_knots(v: float) -> float:
 
 
 def cfbinomiale(n: int, i: int) -> float:
+    # TODO: remove
     return math.factorial(n) / (math.factorial(n - i) * math.factorial(i))
 
 
 def ortodromic2(
     lat1: float, lon1: float, lat2: float, lon2: float
 ) -> Tuple[float, float]:
+    # TODO: remove
     p1 = math.radians(lat1)
     p2 = math.radians(lat2)
     dp = math.radians(lat2 - lat1)
@@ -52,24 +54,26 @@ def ortodromic2(
 
 
 def ortodromic(
-    latA: float, lonA: float, latB: float, lonB: float
+    lat_a: float, lon_a: float, lat_b: float, lon_b: float
 ) -> Tuple[float, float]:
-    # g = geod.Inverse(latA, lonA, latB, lonB)
+    """Returns the ortodromic distance in km between A and B"""
+    # g = geod.Inverse(lat_a, lon_a, lat_b, lon_b)
     # return (g['s12'] * 1e-3, math.radians (g['azi1']))
 
-    p1 = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
-    p2 = latlon.LatLon(latlon.Latitude(latB), latlon.Longitude(lonB))
+    p1 = latlon.LatLon(latlon.Latitude(lat_a), latlon.Longitude(lon_a))
+    p2 = latlon.LatLon(latlon.Latitude(lat_b), latlon.Longitude(lon_b))
     return (p1.distance(p2), math.radians(p1.heading_initial(p2)))
 
 
 def lossodromic(
-    latA: float, lonA: float, latB: float, lonB: float
+    lat_a: float, lon_a: float, lat_b: float, lon_b: float
 ) -> Tuple[float, float]:
-    # g = geod.Inverse(latA, lonA, latB, lonB)
+    """Returns the lossodromic distance in km between A and B"""
+    # g = geod.Inverse(lat_a, lon_a, lat_b, lon_b)
     # return (g['s12'] * 1e-3, math.radians (g['azi1']))
 
-    p1 = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
-    p2 = latlon.LatLon(latlon.Latitude(latB), latlon.Longitude(lonB))
+    p1 = latlon.LatLon(latlon.Latitude(lat_a), latlon.Longitude(lon_a))
+    p2 = latlon.LatLon(latlon.Latitude(lat_b), latlon.Longitude(lon_b))
     return (p1.distance(p2, ellipse="sphere"), math.radians(p1.heading_initial(p2)))
 
 
@@ -81,15 +85,15 @@ def nm2km(d: float) -> float:
     return d / 0.539957
 
 
-def pointDistance(
-    latA: float, lonA: float, latB: float, lonB: float, unit: str = "nm"
+def point_distance(
+    lat_a: float, lon_a: float, lat_b: float, lon_b: float, unit: str = "nm"
 ) -> float:
     """Returns the distance between two geo points"""
-    p1 = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
-    p2 = latlon.LatLon(latlon.Latitude(latB), latlon.Longitude(lonB))
+    p1 = latlon.LatLon(latlon.Latitude(lat_a), latlon.Longitude(lon_a))
+    p2 = latlon.LatLon(latlon.Latitude(lat_b), latlon.Longitude(lon_b))
     d = p1.distance(p2)
 
-    # d = ortodromic(latA, lonA, latB, lonB)[0]
+    # d = ortodromic(lat_a, lon_a, lat_b, lon_b)[0]
 
     if unit == "nm":
         return km2nm(d)
@@ -97,26 +101,26 @@ def pointDistance(
         return d
 
 
-def routagePointDistance(
-    latA: float, lonA: float, distance: float, hdg: float, unit: str = "nm"
+def routage_point_distance(
+    lat_a: float, lon_a: float, distance: float, hdg: float, unit: str = "nm"
 ) -> Tuple[float, float]:
-    """Returns the point from (latA, lonA) to the given (distance, hdg)"""
+    """Returns the point from (lat_a, lon_a) to the given (distance, hdg)"""
     if unit == "nm":
         d = nm2km(distance)
     elif unit == "km":
         d = distance
 
-    # g = geod.Direct(latA, lonA, math.degrees(hdg), d * 1e3)
+    # g = geod.Direct(lat_a, lon_a, math.degrees(hdg), d * 1e3)
     # return (g['lat2'], g['lon2'])
 
-    p = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
+    p = latlon.LatLon(latlon.Latitude(lat_a), latlon.Longitude(lon_a))
     of = p.offset(math.degrees(hdg), d).to_string("D")
     return (float(of[0]), float(of[1]))
 
 
-def maxReachDistance(p, speed: float, dt: float = (1.0 / 60.0 * 60.0)) -> float:
-    maxp = routagePointDistance(p[0], p[1], speed * dt, 1)
-    return pointDistance(p[0], p[1], maxp[0], maxp[1])
+def max_reach_distance(p, speed: float, dt: float = (1.0 / 60.0 * 60.0)) -> float:
+    maxp = routage_point_distance(p[0], p[1], speed * dt, 1)
+    return point_distance(p[0], p[1], maxp[0], maxp[1])
 
 
 def reduce360(alfa: float) -> float:
@@ -144,7 +148,7 @@ def reduce180(alfa: float) -> float:
     return alfa
 
 
-def pathAsGeojson(path) -> object:
+def path_as_geojson(path) -> object:
     feats = []
     route = []
 

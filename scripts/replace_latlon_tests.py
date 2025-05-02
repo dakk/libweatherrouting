@@ -36,25 +36,25 @@ from geographiclib.geodesic import Geodesic
 # measurement.bearing(start,end)
 
 
-def routagePointDistance(latA: float, lonA: float, distance: float, hdg: float):
-    """Returns the point from (latA, lonA) to the given (distance, hdg)"""
+def routage_point_distance(lat_a: float, lon_a: float, distance: float, hdg: float):
+    """Returns the point from (lat_a, lon_a) to the given (distance, hdg)"""
     d = distance
 
-    p = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
+    p = latlon.LatLon(latlon.Latitude(lat_a), latlon.Longitude(lon_a))
     of = p.offset(math.degrees(hdg), d).to_string("D")
     return (float(of[0]), float(of[1]))
 
 
-def ortodromic(latA: float, lonA: float, latB: float, lonB: float):
-    p1 = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
-    p2 = latlon.LatLon(latlon.Latitude(latB), latlon.Longitude(lonB))
+def ortodromic(lat_a: float, lon_a: float, lat_b: float, lon_b: float):
+    p1 = latlon.LatLon(latlon.Latitude(lat_a), latlon.Longitude(lon_a))
+    p2 = latlon.LatLon(latlon.Latitude(lat_b), latlon.Longitude(lon_b))
 
     return (p1.distance(p2), math.radians(p1.heading_initial(p2)))
 
 
-def lossodromic(latA: float, lonA: float, latB: float, lonB: float):
-    p1 = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
-    p2 = latlon.LatLon(latlon.Latitude(latB), latlon.Longitude(lonB))
+def lossodromic(lat_a: float, lon_a: float, lat_b: float, lon_b: float):
+    p1 = latlon.LatLon(latlon.Latitude(lat_a), latlon.Longitude(lon_a))
+    p2 = latlon.LatLon(latlon.Latitude(lat_b), latlon.Longitude(lon_b))
 
     return (p1.distance(p2, ellipse="sphere"), math.radians(p1.heading_initial(p2)))
 
@@ -81,5 +81,5 @@ print(gg, math.degrees(gg[1]))
 g = geod.Direct(-32.06, 115.74, 225, 20000e3)
 print(g)
 
-g = routagePointDistance(-32.06, 115.74, 20000, math.radians(225))
+g = routage_point_distance(-32.06, 115.74, 20000, math.radians(225))
 print(g)

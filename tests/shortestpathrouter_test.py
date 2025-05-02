@@ -22,21 +22,21 @@ from weatherrouting.routers.router import IsoPoint
 from weatherrouting.routers.shortestpathrouter import ShortestPathRouter
 
 from .mock_grib import MockGrib
-from .mock_point_validity import MockPointValidity
+from .mock_point_validity import MockpointValidity
 
 
-class TestRouting_noIsland(unittest.TestCase):
+class TestRoutingNoIsland(unittest.TestCase):
     def setUp(self):
         grib = MockGrib(2, 180, 0.1)
         self.track = [(5, 38), (5.2, 38.2)]
-        island_route = MockPointValidity(self.track)
+        island_route = MockpointValidity(self.track)
         self.routing_obj = weatherrouting.Routing(
             ShortestPathRouter,
             None,
             self.track,
             grib,
             datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
-            pointValidity=island_route.point_validity,
+            point_validity=island_route.point_validity,
         )
 
     def test_step(self):
@@ -55,22 +55,22 @@ class TestRouting_noIsland(unittest.TestCase):
             res.time, datetime.datetime.fromisoformat("2021-04-02 14:00:00")
         )
         self.assertEqual(
-            len(json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))), 1201
+            len(json.dumps(weatherrouting.utils.path_as_geojson(path_to_end))), 1201
         )
 
 
-class TestRouting_mockIsland_5(unittest.TestCase):
+class TestRoutingMockIsland5(unittest.TestCase):
     def setUp(self):
         grib = MockGrib(2, 180, 0.1)
         self.track = [(5, 38), (5.2, 38.2)]
-        island_route = MockPointValidity(self.track, factor=5)
+        island_route = MockpointValidity(self.track, factor=5)
         self.routing_obj = weatherrouting.Routing(
             ShortestPathRouter,
             None,
             self.track,
             grib,
             datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
-            pointValidity=island_route.point_validity,
+            point_validity=island_route.point_validity,
         )
 
     def test_step(self):
@@ -85,7 +85,7 @@ class TestRouting_mockIsland_5(unittest.TestCase):
         self.assertEqual(not res.path, False)
 
 
-class checkRoute_out_of_scope(unittest.TestCase):
+class CheckRouteOutOfScope(unittest.TestCase):
     def setUp(self):
         grib = MockGrib(
             10,
@@ -94,14 +94,14 @@ class checkRoute_out_of_scope(unittest.TestCase):
             out_of_scope=datetime.datetime.fromisoformat("2021-04-02T15:00:00"),
         )
         self.track = [(5, 38), (5.5, 38.5)]
-        island_route = MockPointValidity(self.track, factor=3)
+        island_route = MockpointValidity(self.track, factor=3)
         self.routing_obj = weatherrouting.Routing(
             ShortestPathRouter,
             None,
             self.track,
             grib,
             datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
-            lineValidity=island_route.line_validity,
+            line_validity=island_route.line_validity,
         )
 
     def test_step(self):
@@ -116,18 +116,18 @@ class checkRoute_out_of_scope(unittest.TestCase):
         self.assertEqual(not res.path, False)
 
 
-class TestRouting_custom_step(unittest.TestCase):
+class TestRoutingCustomStep(unittest.TestCase):
     def setUp(self):
         grib = MockGrib(2, 180, 0.1)
         self.track = [(5, 38), (5.2, 38.2)]
-        island_route = MockPointValidity(self.track)
+        island_route = MockpointValidity(self.track)
         self.routing_obj = weatherrouting.Routing(
             ShortestPathRouter,
             None,
             self.track,
             grib,
             datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
-            pointValidity=island_route.point_validity,
+            point_validity=island_route.point_validity,
         )
 
     def test_step(self):
@@ -146,5 +146,5 @@ class TestRouting_custom_step(unittest.TestCase):
             res.time, datetime.datetime.fromisoformat("2021-04-02 14:00:00")
         )
         self.assertEqual(
-            len(json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))), 1813
+            len(json.dumps(weatherrouting.utils.path_as_geojson(path_to_end))), 1813
         )

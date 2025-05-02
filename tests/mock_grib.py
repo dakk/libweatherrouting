@@ -47,7 +47,7 @@ class MockGrib:
             random.random() * self.fuzziness - self.fuzziness / 2
         )
 
-    def getWindAt(self, t, lat, lon) -> Optional[Tuple[float, float]]:
+    def get_wind_at(self, t, lat, lon) -> Optional[Tuple[float, float]]:
         """
         Returns a tuple containing direction in degree and speed in m/s
         """

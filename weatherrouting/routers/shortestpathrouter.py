@@ -19,8 +19,8 @@ from .linearbestisorouter import LinearBestIsoRouter, RouterParam, RoutingResult
 
 class ShortestPathRouter(LinearBestIsoRouter):
     PARAMS = {
-        "minIncrease": RouterParam(
-            "minIncrease",
+        "min_increase": RouterParam(
+            "min_increase",
             "Minimum increase (nm)",
             "float",
             "Set the minimum value for selecting a new valid point",
@@ -30,8 +30,8 @@ class ShortestPathRouter(LinearBestIsoRouter):
             step=0.1,
             digits=1,
         ),
-        "fixedSpeed": RouterParam(
-            "fixedSpeed",
+        "fixed_speed": RouterParam(
+            "fixed_speed",
             "Fixed speed (kn)",
             "float",
             "Set the fixed speed",
@@ -50,7 +50,7 @@ class ShortestPathRouter(LinearBestIsoRouter):
             timedelta,
             start,
             end,
-            lambda t, dt, isoc, end: self.calculateShortestPathIsochrones(
-                self.getParamValue("fixedSpeed"), t, timedelta, isoc, end
+            lambda t, dt, isoc, end: self.calculate_shortest_path_isochrones(
+                self.get_param_value("fixed_speed"), t, timedelta, isoc, end
             ),
         )

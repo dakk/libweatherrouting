@@ -16,15 +16,15 @@ weatherrouting.utils
       cfbinomiale
       km2nm
       lossodromic
-      maxReachDistance
+      max_reach_distance
       nm2km
       ortodromic
       ortodromic2
-      pathAsGeojson
-      pointDistance
+      path_as_geojson
+      point_distance
       reduce180
       reduce360
-      routagePointDistance
+      routage_point_distance
    
    
 

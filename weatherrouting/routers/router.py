@@ -57,7 +57,7 @@ class RouterParam:
         self.step = step
 
 
-class RoutingNoWindException(Exception):
+class RoutingNoWindError(Exception):
     pass
 
 
@@ -70,40 +70,40 @@ class RoutingResult:
         self.progress = progress
 
     def __str__(self):
-        sp = list(map(lambda x: x.toList(True), self.path))
+        sp = list(map(lambda x: x.to_list(True), self.path))
         return f"RoutingResult(time={self.time}, path={sp}, progress={self.progress})"
         # position=%s, self.position,
 
 
 class IsoPoint(NamedTuple):
     pos: Tuple[float, float]
-    prevIdx: int = -1
+    prev_idx: int = -1
     time: Optional[float] = None
     twd: float = 0
     tws: float = 0
     speed: float = 0
     brg: float = 0
-    nextWPDist: float = 0
-    startWPLos: Tuple[float, float] = (0, 0)
+    next_wp_dist: float = 0
+    start_wp_los: Tuple[float, float] = (0, 0)
 
-    def toList(self, onlyPos=False):
-        if onlyPos:
+    def to_list(self, only_pos=False):
+        if only_pos:
             return [self.pos[0], self.pos[1]]
         return [
             self.pos[0],
             self.pos[1],
-            self.prevIdx,
+            self.prev_idx,
             self.time,
             self.twd,
             self.tws,
             self.speed,
             self.brg,
-            self.nextWPDist,
-            self.startWPLos,
+            self.next_wp_dist,
+            self.start_wp_los,
         ]
 
     @staticmethod
-    def fromList(lst):
+    def from_list(lst):
         return IsoPoint(
             (lst[0], lst[1]),
             lst[2],
@@ -119,8 +119,8 @@ class IsoPoint(NamedTuple):
     def lossodromic(self, to):
         return utils.lossodromic(self.pos[0], self.pos[1], to[0], to[1])
 
-    def pointDistance(self, to):
-        return utils.pointDistance(to[0], to[1], self.pos[0], self.pos[1])
+    def point_distance(self, to):
+        return utils.point_distance(to[0], to[1], self.pos[0], self.pos[1])
 
 
 class Router:
@@ -130,100 +130,100 @@ class Router:
         self,
         polar,
         grib,
-        pointValidity=None,
-        lineValidity=None,
-        pointsValidity=None,
-        linesValidity=None,
+        point_validity=None,
+        line_validity=None,
+        points_validity=None,
+        lines_validity=None,
     ):
         self.polar = polar
         self.grib = grib
-        self.pointValidity = pointValidity
-        self.lineValidity = lineValidity
-        self.pointsValidity = pointsValidity
-        self.linesValidity = linesValidity
+        self.point_validity = point_validity
+        self.line_validity = line_validity
+        self.points_validity = points_validity
+        self.lines_validity = lines_validity
 
-        if self.pointsValidity:
-            self.pointValidity = None
-        if self.linesValidity:
-            self.lineValidity = None
+        if self.points_validity:
+            self.point_validity = None
+        if self.lines_validity:
+            self.line_validity = None
 
-    def setParamValue(self, code, value):
+    def set_param_value(self, code, value):
         self.PARAMS[code] = value
 
-    def getParamValue(self, code):
+    def get_param_value(self, code):
         return self.PARAMS[code].value
 
-    def calculateShortestPathIsochrones(self, fixedSpeed, t, dt, isocrone, nextwp):
+    def calculate_shortest_path_isochrones(self, fixed_speed, t, dt, isocrone, nextwp):
         """Calculates isochrones based on shortest path at fixed speed in knots (motoring);
         the speed considers reductions / increases derived from leeway"""
 
-        def pointF(p, tws, twa, dt, brg):
+        def point_f(p, tws, twa, dt, brg):
             # TODO: add current factor
-            speed = fixedSpeed
+            speed = fixed_speed
             return (
-                utils.routagePointDistance(
+                utils.routage_point_distance(
                     p[0], p[1], speed * dt * utils.NAUTICAL_MILE_IN_KM, brg
                 ),
                 speed,
             )
 
-        return self._calculateIsochrones(t, dt, isocrone, nextwp, pointF)
+        return self._calculate_isochrones(t, dt, isocrone, nextwp, point_f)
 
-    def calculateIsochrones(self, t, dt, isocrone, nextwp):
+    def calculate_isochrones(self, t, dt, isocrone, nextwp):
         """Calculate isochrones depending on routageSpeed from polar"""
 
-        def pointF(p, tws, twa, dt, brg):
-            speed = self.polar.getSpeed(tws, math.copysign(twa, 1))
-            # Issue 19 : for routagePointDistance defaut distance unit is nm
+        def point_f(p, tws, twa, dt, brg):
+            speed = self.polar.get_speed(tws, math.copysign(twa, 1))
+            # Issue 19 : for routage_point_distance defaut distance unit is nm
             #  speed*dt is nm  (don't convert in km)
             rpd = (
-                utils.routagePointDistance(p[0], p[1], speed * dt, brg),
+                utils.routage_point_distance(p[0], p[1], speed * dt, brg),
                 speed,
             )
             # print ('tws', tws, 'sog', speed, 'twa', math.degrees(twa), 'brg',
             # math.degrees(brg), 'rpd', rpd)
             return rpd
 
-        return self._calculateIsochrones(t, dt, isocrone, nextwp, pointF)
+        return self._calculate_isochrones(t, dt, isocrone, nextwp, point_f)
 
-    def _filterValidity(self, isonew, last):  # noqa: C901
-        def validPoint(a):
-            if not self.pointValidity(a.pos[0], a.pos[1]):
+    def _filter_validity(self, isonew, last):  # noqa: C901
+        def valid_point(a):
+            if not self.point_validity(a.pos[0], a.pos[1]):
                 return False
             return True
 
-        def validLine(a):
-            if not self.lineValidity(
-                a.pos[0], a.pos[1], last[a.prevIdx].pos[0], last[a.prevIdx].pos[1]
+        def valid_line(a):
+            if not self.line_validity(
+                a.pos[0], a.pos[1], last[a.prev_idx].pos[0], last[a.prev_idx].pos[1]
             ):
                 return False
             return True
 
-        if self.pointValidity:
-            isonew = list(filter(validPoint, isonew))
-        if self.lineValidity:
-            isonew = list(filter(validLine, isonew))
-        if self.pointsValidity:
+        if self.point_validity:
+            isonew = list(filter(valid_point, isonew))
+        if self.line_validity:
+            isonew = list(filter(valid_line, isonew))
+        if self.points_validity:
             pp = list(map(lambda a: a.pos, isonew))
-            pv = self.pointsValidity(pp)
+            pv = self.points_validity(pp)
 
             for x in range(len(isonew)):
                 if not pv[x]:
                     isonew[x] = None
             isonew = list(filter(lambda a: a is not None, isonew))
-        if self.linesValidity:
+        if self.lines_validity:
             pp = list(
                 map(
                     lambda a: [
                         a.pos[0],
                         a.pos[1],
-                        last[a.prevIdx].pos[0],
-                        last[a.prevIdx].pos[1],
+                        last[a.prev_idx].pos[0],
+                        last[a.prev_idx].pos[1],
                     ],
                     isonew,
                 )
             )
-            pv = self.linesValidity(pp)
+            pv = self.lines_validity(pp)
 
             for x in range(len(isonew)):
                 if not pv[x]:
@@ -232,8 +232,8 @@ class Router:
 
         return isonew
 
-    def _calculateIsochronesConcurrent(self, t, dt, isocrone, nextwp, pointF):
-        """Calcuates isochrones based on pointF next point calculation"""
+    def _calculate_isochrones_concurrent(self, t, dt, isocrone, nextwp, point_f):
+        """Calcuates isochrones based on point_f next point calculation"""
         last = isocrone[-1]
 
         newisopoints = []
@@ -244,9 +244,9 @@ class Router:
             p = last[i]
 
             try:
-                (twd, tws) = self.grib.getWindAt(t, p.pos[0], p.pos[1])
+                (twd, tws) = self.grib.get_wind_at(t, p.pos[0], p.pos[1])
             except Exception as e:
-                raise RoutingNoWindException() from e
+                raise RoutingNoWindError() from e
 
             twd = math.radians(twd)
             tws = utils.ms_to_knots(tws)
@@ -256,21 +256,21 @@ class Router:
                 brg = utils.reduce360(twd + twa)
 
                 # Calculate next point
-                ptoiso, speed = pointF(p.pos, tws, twa, dt, brg)
+                ptoiso, speed = point_f(p.pos, tws, twa, dt, brg)
 
-                nextwpdist = utils.pointDistance(
+                nextwpdist = utils.point_distance(
                     ptoiso[0], ptoiso[1], nextwp[0], nextwp[1]
                 )
                 startwplos = isocrone[0][0].lossodromic((ptoiso[0], ptoiso[1]))
 
-                if nextwpdist > p.nextWPDist:
+                if nextwpdist > p.next_wp_dist:
                     continue
 
-                # if self.pointValidity:
-                # 	if not self.pointValidity (ptoiso[0], ptoiso[1]):
+                # if self.point_validity:
+                # 	if not self.point_validity (ptoiso[0], ptoiso[1]):
                 # 		continue
-                # if self.lineValidity:
-                # 	if not self.lineValidity (ptoiso[0], ptoiso[1], p.pos[0], p.pos[1]):
+                # if self.line_validity:
+                # 	if not self.line_validity (ptoiso[0], ptoiso[1], p.pos[0], p.pos[1]):
                 # 		continue
 
                 cisos.append(
@@ -295,27 +295,27 @@ class Router:
 
         executor.shutdown()
 
-        newisopoints = sorted(newisopoints, key=(lambda a: a.startWPLos[1]))
+        newisopoints = sorted(newisopoints, key=(lambda a: a.start_wp_los[1]))
 
         # Remove slow isopoints inside
         bearing = {}
         for x in newisopoints:
-            k = str(int(math.degrees(x.startWPLos[1])))
+            k = str(int(math.degrees(x.start_wp_los[1])))
 
             if k in bearing:
-                if x.nextWPDist < bearing[k].nextWPDist:
+                if x.next_wp_dist < bearing[k].next_wp_dist:
                     bearing[k] = x
             else:
                 bearing[k] = x
 
-        isonew = self._filterValidity(list(bearing.values()), last)
-        isonew = sorted(isonew, key=(lambda a: a.startWPLos[1]))
+        isonew = self._filter_validity(list(bearing.values()), last)
+        isonew = sorted(isonew, key=(lambda a: a.start_wp_los[1]))
         isocrone.append(isonew)
 
         return isocrone
 
-    def _calculateIsochrones(self, t, dt, isocrone, nextwp, pointF):
-        """Calcuates isochrones based on pointF next point calculation"""
+    def _calculate_isochrones(self, t, dt, isocrone, nextwp, point_f):
+        """Calcuates isochrones based on point_f next point calculation"""
         last = isocrone[-1]
 
         newisopoints = []
@@ -325,9 +325,9 @@ class Router:
             p = last[i]
 
             try:
-                (twd, tws) = self.grib.getWindAt(t, p.pos[0], p.pos[1])
+                (twd, tws) = self.grib.get_wind_at(t, p.pos[0], p.pos[1])
             except Exception as e:
-                raise RoutingNoWindException() from e
+                raise RoutingNoWindError() from e
 
             twd = math.radians(twd)
             tws = utils.ms_to_knots(tws)
@@ -337,21 +337,21 @@ class Router:
                 brg = utils.reduce360(twd + twa)
 
                 # Calculate next point
-                ptoiso, speed = pointF(p.pos, tws, twa, dt, brg)
+                ptoiso, speed = point_f(p.pos, tws, twa, dt, brg)
 
-                nextwpdist = utils.pointDistance(
+                nextwpdist = utils.point_distance(
                     ptoiso[0], ptoiso[1], nextwp[0], nextwp[1]
                 )
                 startwplos = isocrone[0][0].lossodromic((ptoiso[0], ptoiso[1]))
 
-                if nextwpdist > p.nextWPDist:
+                if nextwpdist > p.next_wp_dist:
                     continue
 
-                # if self.pointValidity:
-                # 	if not self.pointValidity (ptoiso[0], ptoiso[1]):
+                # if self.point_validity:
+                # 	if not self.point_validity (ptoiso[0], ptoiso[1]):
                 # 		continue
-                # if self.lineValidity:
-                # 	if not self.lineValidity (ptoiso[0], ptoiso[1], p.pos[0], p.pos[1]):
+                # if self.line_validity:
+                # 	if not self.line_validity (ptoiso[0], ptoiso[1], p.pos[0], p.pos[1]):
                 # 		continue
 
                 newisopoints.append(
@@ -368,26 +368,26 @@ class Router:
                     )
                 )
 
-        newisopoints = sorted(newisopoints, key=(lambda a: a.startWPLos[1]))
+        newisopoints = sorted(newisopoints, key=(lambda a: a.start_wp_los[1]))
 
         # Remove slow isopoints inside
         bearing = {}
         for x in newisopoints:
-            k = str(int(math.degrees(x.startWPLos[1])))
+            k = str(int(math.degrees(x.start_wp_los[1])))
 
             if k in bearing:
-                if x.nextWPDist < bearing[k].nextWPDist:
+                if x.next_wp_dist < bearing[k].next_wp_dist:
                     bearing[k] = x
             else:
                 bearing[k] = x
 
-        isonew = self._filterValidity(list(bearing.values()), last)
-        isonew = sorted(isonew, key=(lambda a: a.startWPLos[1]))
+        isonew = self._filter_validity(list(bearing.values()), last)
+        isonew = sorted(isonew, key=(lambda a: a.start_wp_los[1]))
         isocrone.append(isonew)
 
         return isocrone
 
-    def calculateVMG(self, speed, angle, start, end) -> float:
+    def calculate_vmg(self, speed, angle, start, end) -> float:
         """Calculates the Velocity-Made-Good of a boat sailing from start to end
         at current speed / angle"""
         return speed * math.cos(angle)
