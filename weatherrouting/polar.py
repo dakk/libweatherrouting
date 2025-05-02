@@ -33,7 +33,7 @@ class Polar:
         self.tws = []
         self.twa = []
         self.vmgdict: Dict[Tuple[float, float], Tuple[float, float]] = {}
-        self.speedTable = []
+        self.speed_table = []
 
         if f is None:
             f = open(polar_path, "r")
@@ -51,7 +51,7 @@ class Polar:
             for i in range(1, len(data)):
                 speed = float(data[i])
                 speedline.append(speed)
-            self.speedTable.append(speedline)
+            self.speed_table.append(speedline)
             line = f.readline()
         f.close()
 
@@ -64,7 +64,7 @@ class Polar:
         l_idx = 0
         for y in self.twa:
             s += f"{round(math.degrees(y))}"
-            sl = self.speedTable[l_idx]
+            sl = self.speed_table[l_idx]
 
             for x in sl:
                 s += f"\t{x:.1f}"
@@ -97,10 +97,10 @@ class Polar:
             if twa <= self.twa[k]:
                 twa2 = k
 
-        speed1 = self.speedTable[twa1][tws1]
-        speed2 = self.speedTable[twa2][tws1]
-        speed3 = self.speedTable[twa1][tws2]
-        speed4 = self.speedTable[twa2][tws2]
+        speed1 = self.speed_table[twa1][tws1]
+        speed2 = self.speed_table[twa2][tws1]
+        speed3 = self.speed_table[twa1][tws2]
+        speed4 = self.speed_table[twa2][tws2]
 
         if twa1 != twa2:
             speed12 = speed1 + (speed2 - speed1) * (twa - self.twa[twa1]) / (
