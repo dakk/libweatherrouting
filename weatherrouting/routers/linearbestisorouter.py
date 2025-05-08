@@ -52,7 +52,7 @@ class LinearBestIsoRouter(Router):
             path = path[::-1]
             position = path[-1].pos
 
-        if self.grib.getWindAt(
+        if self.grib.get_wind_at(
             time + datetime.timedelta(hours=timedelta), end[0], end[1]
         ):
             if lastlog is not None and len(lastlog.isochrones) > 0:
@@ -76,7 +76,7 @@ class LinearBestIsoRouter(Router):
             for p in isoc[-1]:
                 distance_to_end_point = p.pointDistance(end)
                 if distance_to_end_point < self.getParamValue("minIncrease"):
-                    # (twd,tws) = self.grib.getWindAt (time + datetime.timedelta(hours=timedelta),
+                    # (twd,tws) = self.grib.get_wind_at (time + datetime.timedelta(hours=timedelta),
                     # p.pos[0], p.pos[1])
                     maxReachDistance = utils.maxReachDistance(p.pos, p.speed)
                     if distance_to_end_point < abs(maxReachDistance * 1.1):

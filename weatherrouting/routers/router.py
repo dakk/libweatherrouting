@@ -278,7 +278,7 @@ class Router:
             p = last[i]
 
             try:
-                (twd, tws) = self.grib.getWindAt(t, p.pos[0], p.pos[1])
+                (twd, tws) = self.grib.get_wind_at(t, p.pos[0], p.pos[1])
             except Exception as e:
                 raise RoutingNoWindException() from e
 

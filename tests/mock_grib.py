@@ -40,7 +40,7 @@ class MockGrib:
             random.random() * self.fuzziness - self.fuzziness / 2
         )
 
-    def getWindAt(self, t, lat, lon):
+    def get_wind_at(self, t, lat, lon):
         if not self.out_of_scope or t < self.out_of_scope:
             return (
                 self.twd_var(t),

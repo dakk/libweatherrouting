@@ -20,7 +20,7 @@ class Grib:
     Grib class is an abstract class that should be implement for providing grib data to routers
     """
 
-    def getWindAt(self, t: float, lat: float, lon: float) -> Tuple[float, float]:
+    def get_wind_at(self, t: float, lat: float, lon: float) -> Tuple[float, float]:
         """
         Returns (twd: degree, tws: knots) for the given point (lat, lon) at time t
         or None if running out of temporal/geographic grib scope
