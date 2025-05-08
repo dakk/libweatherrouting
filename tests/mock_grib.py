@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017-2024 Davide Gessa
+# Copyright (C) 2017-2025 Davide Gessa
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,10 +14,17 @@
 # For detail about GNU see <http://www.gnu.org/licenses/>.
 import datetime
 import random
+from typing import Optional, Tuple
 
 
 class MockGrib:
     def __init__(self, starttws, starttwd, fuzziness, out_of_scope=None):
+        """
+        Params:
+            starttws: start wind speed in m/s
+            starttwd: start wind direction in degree
+            fuzziness: randomness factor
+        """
         self.starttws = starttws
         self.starttwd = starttwd
         self.fuzziness = fuzziness
@@ -40,7 +47,10 @@ class MockGrib:
             random.random() * self.fuzziness - self.fuzziness / 2
         )
 
-    def get_wind_at(self, t, lat, lon):
+    def get_wind_at(self, t, lat, lon) -> Optional[Tuple[float, float]]:
+        """
+        Returns a tuple containing direction in degree and speed in m/s
+        """
         if not self.out_of_scope or t < self.out_of_scope:
             return (
                 self.twd_var(t),

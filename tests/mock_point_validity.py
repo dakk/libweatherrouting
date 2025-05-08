@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017-2024 Davide Gessa
+# Copyright (C) 2017-2025 Davide Gessa
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,12 +22,12 @@ class MockpointValidity:
             (track[0][0] + track[1][0]) / 2,
         )
         self.mean_island = (
-            weatherrouting.utils.pointDistance(*(track[0] + track[1])) / factor
+            weatherrouting.utils.point_distance(*(track[0] + track[1])) / factor
         )
 
     def point_validity(self, y, x):
         if (
-            weatherrouting.utils.pointDistance(x, y, *(self.mean_point))
+            weatherrouting.utils.point_distance(x, y, *(self.mean_point))
             < self.mean_island
         ):
             return False
@@ -36,7 +36,7 @@ class MockpointValidity:
 
     def line_validity(self, y1, x1, y2, x2):
         if (
-            weatherrouting.utils.pointDistance(x1, y2, *(self.mean_point))
+            weatherrouting.utils.point_distance(x1, y2, *(self.mean_point))
             < self.mean_island
         ):
             return False

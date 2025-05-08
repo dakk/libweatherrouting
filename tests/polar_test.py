@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017-2024 Davide Gessa
+# Copyright (C) 2017-2025 Davide Gessa
 # Copyright (C) 2021 Enrico Ferreguti
 #
 # This program is free software: you can redistribute it and/or modify
@@ -26,42 +26,42 @@ class TestPolar(unittest.TestCase):
             os.path.join(os.path.dirname(__file__), "data/bavaria38.pol")
         )
 
-    def test_toString(self):
+    def test_to_string(self):
         f = open(os.path.join(os.path.dirname(__file__), "data/bavaria38.pol"), "r")
         d = f.read()
         f.close()
-        self.assertEqual(self.polar_obj.toString(), d)
+        self.assertEqual(self.polar_obj.to_string(), d)
 
-    def test_getSpeed(self):
+    def test_get_speed(self):
         self.assertAlmostEqual(
-            self.polar_obj.getSpeed(8, math.radians(60)), 6.1, delta=0.001
+            self.polar_obj.get_speed(8, math.radians(60)), 6.1, delta=0.001
         )
         self.assertAlmostEqual(
-            self.polar_obj.getSpeed(8.3, math.radians(60)), 6.205, delta=0.001
+            self.polar_obj.get_speed(8.3, math.radians(60)), 6.205, delta=0.001
         )
         self.assertAlmostEqual(
-            self.polar_obj.getSpeed(8.3, math.radians(64)), 6.279, delta=0.001
+            self.polar_obj.get_speed(8.3, math.radians(64)), 6.279, delta=0.001
         )
         self.assertAlmostEqual(
-            self.polar_obj.getSpeed(2.2, math.radians(170)), 1.1, delta=0.001
+            self.polar_obj.get_speed(2.2, math.radians(170)), 1.1, delta=0.001
         )
 
     def test_routage(self):
         self.assertAlmostEqual(
-            self.polar_obj.getRoutageSpeed(2.2, math.radians(170)),
+            self.polar_obj.get_routage_speed(2.2, math.radians(170)),
             1.2406897519211786,
             delta=0.001,
         )
         self.assertAlmostEqual(
-            self.polar_obj.getTWARoutage(2.2, math.radians(170)),
+            self.polar_obj.get_twa_routage(2.2, math.radians(170)),
             2.4434609527920568,
             delta=0.001,
         )
 
     def test_reaching(self):
         self.assertAlmostEqual(
-            self.polar_obj.getReaching(6.1)[0], 5.3549999999999995, delta=0.001
+            self.polar_obj.get_reaching(6.1)[0], 5.3549999999999995, delta=0.001
         )
         self.assertAlmostEqual(
-            self.polar_obj.getReaching(6.1)[1], 1.3962634015954636, delta=0.001
+            self.polar_obj.get_reaching(6.1)[1], 1.3962634015954636, delta=0.001
         )

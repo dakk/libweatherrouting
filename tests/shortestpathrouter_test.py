@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017-2024 Davide Gessa
+# Copyright (C) 2017-2025 Davide Gessa
 # Copyright (C) 2021 Enrico Ferreguti
 #
 # This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ class TestRoutingNoIsland(unittest.TestCase):
             self.track,
             grib,
             datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
-            pointValidity=island_route.point_validity,
+            point_validity=island_route.point_validity,
         )
 
     def test_step(self):
@@ -55,7 +55,7 @@ class TestRoutingNoIsland(unittest.TestCase):
             res.time, datetime.datetime.fromisoformat("2021-04-02 14:00:00")
         )
         self.assertEqual(
-            len(json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))), 1197
+            len(json.dumps(weatherrouting.utils.path_as_geojson(path_to_end))), 1201
         )
 
 
@@ -70,7 +70,7 @@ class TestRoutingMockIsland5(unittest.TestCase):
             self.track,
             grib,
             datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
-            pointValidity=island_route.point_validity,
+            point_validity=island_route.point_validity,
         )
 
     def test_step(self):
@@ -101,7 +101,7 @@ class CheckRouteOutOfScope(unittest.TestCase):
             self.track,
             grib,
             datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
-            lineValidity=island_route.line_validity,
+            line_validity=island_route.line_validity,
         )
 
     def test_step(self):
@@ -127,7 +127,7 @@ class TestRoutingCustomStep(unittest.TestCase):
             self.track,
             grib,
             datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
-            pointValidity=island_route.point_validity,
+            point_validity=island_route.point_validity,
         )
 
     def test_step(self):
@@ -146,5 +146,5 @@ class TestRoutingCustomStep(unittest.TestCase):
             res.time, datetime.datetime.fromisoformat("2021-04-02 14:00:00")
         )
         self.assertEqual(
-            len(json.dumps(weatherrouting.utils.pathAsGeojson(path_to_end))), 1785
+            len(json.dumps(weatherrouting.utils.path_as_geojson(path_to_end))), 1813
         )

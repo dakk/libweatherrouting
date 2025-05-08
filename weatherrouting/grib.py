@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017-2024 Davide Gessa
+# Copyright (C) 2017-2025 Davide Gessa
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -11,18 +11,21 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+from abc import ABC, abstractmethod
+
 # For detail about GNU see <http://www.gnu.org/licenses/>.
 from typing import Tuple
 
 
-class Grib:
+class Grib(ABC):
     """
     Grib class is an abstract class that should be implement for providing grib data to routers
     """
 
+    @abstractmethod
     def get_wind_at(self, t: float, lat: float, lon: float) -> Tuple[float, float]:
         """
-        Returns (twd: degree, tws: knots) for the given point (lat, lon) at time t
+        Returns (twd: degree, tws: m/s) for the given point (lat, lon) at time t
         or None if running out of temporal/geographic grib scope
         """
         raise Exception("Not implemented")

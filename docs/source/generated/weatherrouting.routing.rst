@@ -13,7 +13,7 @@ weatherrouting.routing
 
    .. autosummary::
    
-      listRoutingAlgorithms
+      list_routing_algorithms
    
    
 

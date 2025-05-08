@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017-2024 Davide Gessa
+# Copyright (C) 2017-2025 Davide Gessa
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,5 +15,5 @@
 from .grib import Grib  # noqa: F401
 from .polar import Polar  # noqa: F401
 from .routers import *  # noqa: F401, F403
-from .routing import Routing, listRoutingAlgorithms  # noqa: F401
+from .routing import Routing, list_routing_algorithms  # noqa: F401
 from .utils import *  # noqa: F401, F403

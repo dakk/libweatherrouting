@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017-2024 Davide Gessa
+# Copyright (C) 2017-2025 Davide Gessa
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ from typing import List
 from .routers import RoutingResult, linearbestisorouter
 
 
-def listRoutingAlgorithms():
+def list_routing_algorithms():
     """Return a list of routing algorithms along with their names"""
 
     return [
@@ -39,12 +39,12 @@ class Routing:
         polar,
         track,
         grib,
-        startDatetime,
-        startPosition=None,
-        pointValidity=None,
-        lineValidity=None,
-        pointsValidity=None,
-        linesValidity=None,
+        start_datetime,
+        start_position=None,
+        point_validity=None,
+        line_validity=None,
+        points_validity=None,
+        lines_validity=None,
     ):
         """
         Parameters
@@ -57,25 +57,25 @@ class Routing:
                 A list of track points (lat, lon)
         grib : Grib
                 Grib object that abstract our wind / wave / wathever queries
-        startDateTime : datetime
+        start_datetime : datetime
                 Start time
-        startPosition : (float, float)
+        start_position : (float, float)
                 Optional, default to None
                 A pair containing initial position (or None if we want to start from the
                 first track point)
-        pointValidity : function(lat, lon)
+        point_validity : function(lat, lon)
                 Optional, default to None
                 A functions that receives lat and lon and returns True if the point is valid
                 (ie: in the sea)
-        lineValidity : function(lat1, lon1, lat2, lon2)
+        line_validity : function(lat1, lon1, lat2, lon2)
                 Optional, default to None
                 A functions that receives a vector defined by lat1, lon1, lat2, lon2 and
                 returns True if the line is valid (ie: completely in the sea)
-        pointsValidity : function (latlons)
+        points_validity : function (latlons)
                 Optional, default to None
                 A functions that receives a list of latlon and returns a list of boolean with
                 True if the point at i is valid (ie: in the sea)
-        linesValidity : function(latlons)
+        lines_validity : function(latlons)
                 Optional, default to None
                 A functions that receives a list of vectors defined by lat1, lon1, lat2, lon2
                 and returns a list of boolean with True if the line at i is valid (ie:
@@ -85,19 +85,19 @@ class Routing:
 
         self.end = False
         self.algorithm = algorithm(
-            polar, grib, pointValidity, lineValidity, pointsValidity, linesValidity
+            polar, grib, point_validity, line_validity, points_validity, lines_validity
         )
         self.track = track
         self.steps = 0
         self.path = []
-        self.time = startDatetime
+        self.time = start_datetime
         self.grib = grib
         self.log = []
         self._startingNewPoint = True
 
-        if startPosition:
+        if start_position:
             self.wp = 0
-            self.position = startPosition
+            self.position = start_position
         else:
             self.wp = 1
             self.position = self.track[0]

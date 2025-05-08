@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017-2024 Davide Gessa
+# Copyright (C) 2017-2025 Davide Gessa
 # Copyright (C) 2021 Enrico Ferreguti
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,12 +19,12 @@ import weatherrouting
 
 
 class TestUtils(unittest.TestCase):
-    def test_pointDistance(self):
+    def test_point_distance(self):
         self.assertEqual(
-            round(weatherrouting.utils.pointDistance(0.0, 0.0, 1 / 60, 0.0)), 1
+            round(weatherrouting.utils.point_distance(0.0, 0.0, 1 / 60, 0.0)), 1
         )
 
     def test_max_dist_reaching(self):
         p1 = (5, 38)
-        maxd = weatherrouting.utils.maxReachDistance(p1, 5)
+        maxd = weatherrouting.utils.max_reach_distance(p1, 5)
         self.assertAlmostEqual(maxd, 5.000000000000199, delta=0.001)

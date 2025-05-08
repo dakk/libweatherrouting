@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017-2024 Davide Gessa
+# Copyright (C) 2017-2025 Davide Gessa
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@ from setuptools import setup
 
 setup(
     name="weatherrouting",
-    version="0.1.9",
+    version="0.2.1",
     description="Weather routing library for sailing",
-    author=["Davide Gessa"],
+    author="Davide Gessa",
     setup_requires="setuptools",
     author_email="gessadavide@gmail.com",
     packages=["weatherrouting", "weatherrouting.routers"],

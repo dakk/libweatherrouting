@@ -26,8 +26,9 @@ performs a wind forecast analysis for the specified time and location (usually s
 and returns a tuple with true wind direction (`twd`) expressed in degrees and true wind speed (`tws`) expressed in meters per second or `None` if running out of temporal/geographic grib scope.
 
 ```python
-def getWindAt(t, lat, lon)
+def get_wind_at(t, lat, lon)
     # wind forecast analysys implementation
+    # speed is in m/s, direction in degrees
     ...
     return (twd, tws)
 ```
@@ -92,11 +93,11 @@ routing_obj = Routing(
     LinearBestIsoRouter,            # specify a router type
     polar_obj,                      # the polar object for a specific sail boat
     track,                          # the list of track points (lat,lon)
-    getWindAt,                      # the function that returns (twd,tws) for a specified (datetime, lat, lon)
+    get_wind_at,                      # the function that returns (twd,tws) for a specified (datetime, lat, lon)
     start,                          # the start datetime
     start_position = (37.8, 4.8)    # the start location (lat lon, optional, the first track point if undefined)
-    pointValidity = point_validity  # the point validity function (optional)
-    lineValidity = line_validity    # the line validity function (optional)
+    point_validity = point_validity  # the point validity function (optional)
+    line_validity = line_validity    # the line validity function (optional)
 )
 ```
 
@@ -125,10 +126,10 @@ res.path         # the list of route waypoints
 ### Export path as geojson
 The path could be exported as a geojson object for cartographic representation
 ```python
-from weatherrouting.utils import pathAsGeojson
+from weatherrouting.utils import path_as_geojson
 import json
 
-json.dumps(pathAsGeojson(res.path))
+json.dumps(path_as_geojson(res.path))
 ```
 
 

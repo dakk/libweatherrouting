@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017-2024 Davide Gessa
+# Copyright (C) 2017-2025 Davide Gessa
 # Copyright (C) 2021 Enrico Ferreguti
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,7 +14,8 @@
 
 # For detail about GNU see <http://www.gnu.org/licenses/>.
 import datetime
-import json
+
+# import json
 import math
 import os
 import time
@@ -105,7 +106,7 @@ class TestRoutingLowWindNoIsland(unittest.TestCase):
             self.track,
             grib,
             datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
-            pointValidity=island_route.point_validity,
+            point_validity=island_route.point_validity,
         )
 
     def test_step(self):
@@ -116,20 +117,20 @@ class TestRoutingLowWindNoIsland(unittest.TestCase):
             res = self.routing_obj.step()
             i += 1
 
-        # self.assertEqual(i, 8)
+        self.assertEqual(i, 7)
         self.assertEqual(not res.path, False)
 
         path_to_end = res.path
-        # self.assertEqual(
-        #     res.time, datetime.datetime.fromisoformat("2021-04-02 19:00:00")
-        # )
+        self.assertEqual(
+            res.time, datetime.datetime.fromisoformat("2021-04-02 18:00:00")
+        )
 
-        gj = weatherrouting.utils.pathAsGeojson(path_to_end)  # noqa: F841
+        gj = weatherrouting.utils.path_as_geojson(path_to_end)
 
-        # self.assertEqual(len(gj["features"]), 9)
-        # self.assertEqual(
-        #     gj["features"][8]["properties"]["end-timestamp"], "2021-04-02 19:00:00"
-        # )
+        self.assertEqual(len(gj["features"]), 8)
+        self.assertEqual(
+            gj["features"][-1]["properties"]["end-timestamp"], "2021-04-02 18:00:00"
+        )
 
 
 class TestRoutingLowWindMockIsland5(unittest.TestCase):
@@ -143,7 +144,7 @@ class TestRoutingLowWindMockIsland5(unittest.TestCase):
             self.track,
             grib,
             datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
-            pointValidity=island_route.point_validity,
+            point_validity=island_route.point_validity,
         )
 
     def test_step(self):
@@ -154,7 +155,7 @@ class TestRoutingLowWindMockIsland5(unittest.TestCase):
             res = self.routing_obj.step()
             i += 1
 
-        self.assertEqual(i, 8)
+        self.assertEqual(i, 7)
         self.assertEqual(not res.path, False)
 
 
@@ -169,7 +170,7 @@ class CheckRouteMediumWindMockIsland8(unittest.TestCase):
             self.track,
             grib,
             datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
-            lineValidity=island_route.line_validity,
+            line_validity=island_route.line_validity,
         )
 
     def test_step(self):
@@ -180,7 +181,7 @@ class CheckRouteMediumWindMockIsland8(unittest.TestCase):
             res = self.routing_obj.step()
             i += 1
 
-        self.assertEqual(i, 5)
+        self.assertEqual(i, 7)
         self.assertEqual(not res.path, False)
 
 
@@ -195,7 +196,7 @@ class CheckRouteHighWindMockIsland3(unittest.TestCase):
             self.track,
             grib,
             datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
-            lineValidity=island_route.line_validity,
+            line_validity=island_route.line_validity,
         )
 
     def test_step(self):
@@ -206,7 +207,7 @@ class CheckRouteHighWindMockIsland3(unittest.TestCase):
             res = self.routing_obj.step()
             i += 1
 
-        # self.assertEqual(i, 10)
+        self.assertEqual(i, 7)
         self.assertEqual(not res.path, False)
 
 
@@ -226,7 +227,7 @@ class CheckRouteOutOfScope(unittest.TestCase):
             self.track,
             grib,
             datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
-            lineValidity=island_route.line_validity,
+            line_validity=island_route.line_validity,
         )
 
     def test_step(self):
@@ -262,7 +263,7 @@ class CheckRouteMultipoint(unittest.TestCase):
             res = self.routing_obj.step()
             i += 1
 
-        self.assertEqual(i, 5)
+        self.assertEqual(i, 6)
         self.assertEqual(not res.path, False)
 
 
@@ -277,7 +278,7 @@ class TestRoutingCustomStep(unittest.TestCase):
             self.track,
             grib,
             datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
-            pointValidity=island_route.point_validity,
+            point_validity=island_route.point_validity,
         )
 
     def test_step(self):
@@ -288,5 +289,5 @@ class TestRoutingCustomStep(unittest.TestCase):
             res = self.routing_obj.step(timedelta=0.5)
             i += 1
 
-        self.assertEqual(i, 14)
+        self.assertEqual(i, 12)
         self.assertEqual(not res.path, False)

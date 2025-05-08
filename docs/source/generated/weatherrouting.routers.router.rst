@@ -30,7 +30,7 @@ weatherrouting.routers.router
 
    .. autosummary::
    
-      RoutingNoWindException
+      RoutingNoWindError
    
    
 
