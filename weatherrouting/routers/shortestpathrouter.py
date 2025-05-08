@@ -19,6 +19,7 @@ from .linearbestisorouter import LinearBestIsoRouter, RouterParam, RoutingResult
 
 class ShortestPathRouter(LinearBestIsoRouter):
     PARAMS = {
+        **LinearBestIsoRouter.PARAMS,
         "min_increase": RouterParam(
             "min_increase",
             "Minimum increase (nm)",

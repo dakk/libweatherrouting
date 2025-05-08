@@ -14,11 +14,13 @@
 
 # For detail about GNU see <http://www.gnu.org/licenses/>.
 import datetime
-
-# import json
+import json
 import math
 import os
+import time
 import unittest
+
+from parameterized import parameterized
 
 import weatherrouting
 from weatherrouting.routers.linearbestisorouter import LinearBestIsoRouter
@@ -38,51 +40,58 @@ def heading(y, x):
     return (90 - a + 360) % 360
 
 
-# class TestRoutingStraigthUpwind(unittest.TestCase):
-#     def test_step(self):
-#         base_step = [
-#             [1, 0],
-#             [1, 1],
-#             [0, 1],
-#             [-1, 1],
-#             [-1, 0],
-#             [-1, -1],
-#             [0, -1],
-#             [1, -1],
-#         ]
-#         base_start = [34, 17]
-#         base_gjs = {}
+class TestRoutingStraigthUpwind(unittest.TestCase):
+    @parameterized.expand(
+        [
+            [1, 0],
+            [1, 1],
+            [0, 1],
+            [-1, 1],
+            [-1, 0],
+            [-1, -1],
+            [0, -1],
+            [1, -1],
+        ]
+    )
+    def test_step(self, s0, s1):
+        base_start = [34, 17]
+        base_gjs = {}
 
-#         for s in base_step:
-#             base_end = [base_start[0] + s[0], base_start[1] + s[1]]
-#             head = heading(*s)
-#             print("TEST UPWIND TWD", head, "step", s)
-#             pvmodel = MockpointValidity([base_start, base_end])
-#             routing_obj = weatherrouting.Routing(
-#                 LinearBestIsoRouter,
-#                 polar_bavaria38,
-#                 [base_start, base_end],
-#                 MockGrib(10, head, 0),
-#                 datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
-#                 line_validity=pvmodel.line_validity,
-#             )
-#             res = None
-#             i = 0
+        base_end = [base_start[0] + s0, base_start[1] + s1]
+        head = heading(s0, s1)
+        # print("TEST UPWIND TWD", head, "step", s0, s1)
+        pvmodel = MockpointValidity([base_start, base_end])
+        routing_obj = weatherrouting.Routing(
+            LinearBestIsoRouter,
+            polar_bavaria38,
+            [base_start, base_end],
+            MockGrib(10, head, 0),
+            datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
+            line_validity=pvmodel.line_validity,
+        )
+        routing_obj.algorithm.set_param_value("subdiv", 2)
+        res = None
+        i = 0
 
-#             while not routing_obj.end:
-#                 res = routing_obj.step()
-#                 i += 1
+        ptime = time.time()
+        while not routing_obj.end:
+            res = routing_obj.step()
+            i += 1
+            ntime = time.time()
+            # print(i, ntime - ptime, "\n")
+            # print(routing_obj.get_current_best_path(), "\n")
+            ptime = ntime  # noqa: F841
 
-#             path_to_end = res.path
-#             if not base_gjs:
-#                 base_gjs = weatherrouting.utils.path_as_geojson(path_to_end)
-#             else:
-#                 base_gjs["features"] += weatherrouting.utils.path_as_geojson(path_to_end)[
-#                     "features"
-#                 ]
-#             gjs = json.dumps(base_gjs)
+        path_to_end = res.path
+        if not base_gjs:
+            base_gjs = weatherrouting.utils.path_as_geojson(path_to_end)
+        else:
+            base_gjs["features"] += weatherrouting.utils.path_as_geojson(path_to_end)[
+                "features"
+            ]
+        gjs = json.dumps(base_gjs)  # noqa: F841
 
-#         print(gjs)
+        # print(gjs)
 
 
 class TestRoutingLowWindNoIsland(unittest.TestCase):

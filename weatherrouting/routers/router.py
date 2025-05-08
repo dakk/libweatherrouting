@@ -17,7 +17,8 @@
 
 import math
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Dict, NamedTuple, Optional, Tuple
+from dataclasses import dataclass
+from typing import Any, Dict, Optional, Tuple
 
 from .. import utils
 
@@ -75,7 +76,8 @@ class RoutingResult:
         # position=%s, self.position,
 
 
-class IsoPoint(NamedTuple):
+@dataclass
+class IsoPoint:
     pos: Tuple[float, float]
     prev_idx: int = -1
     time: Optional[float] = None
@@ -124,7 +126,28 @@ class IsoPoint(NamedTuple):
 
 
 class Router:
-    PARAMS: Dict[str, Any] = {}
+    PARAMS: Dict[str, Any] = {
+        "subdiv": RouterParam(
+            "subdiv",
+            "Filtering subdivision of isopoint resolution",
+            "int",
+            "Set the filtering subdivision of isopoint resolution",
+            default=1,
+            lower=1,
+            upper=30,
+            step=1,
+            digits=0,
+        ),
+        "concurrent": RouterParam(
+            "concurrent",
+            "Calculation concurrency",
+            "bool",
+            "Enable isochrones calculation concurrency",
+            default=False,
+            lower=False,
+            upper=True,
+        ),
+    }
 
     def __init__(
         self,
@@ -148,9 +171,13 @@ class Router:
             self.line_validity = None
 
     def set_param_value(self, code, value):
-        self.PARAMS[code] = value
+        if code not in self.PARAMS:
+            raise Exception(f"Invalid param: {code}")
+        self.PARAMS[code].value = value
 
     def get_param_value(self, code):
+        if code not in self.PARAMS:
+            raise Exception(f"Invalid param: {code}")
         return self.PARAMS[code].value
 
     def calculate_shortest_path_isochrones(self, fixed_speed, t, dt, isocrone, nextwp):
@@ -167,7 +194,9 @@ class Router:
                 speed,
             )
 
-        return self._calculate_isochrones(t, dt, isocrone, nextwp, point_f)
+        return self._calculate_isochrones(
+            t, dt, isocrone, nextwp, point_f, self.get_param_value("subdiv")
+        )
 
     def calculate_isochrones(self, t, dt, isocrone, nextwp):
         """Calculate isochrones depending on routageSpeed from polar"""
@@ -181,10 +210,13 @@ class Router:
                 speed,
             )
             # print ('tws', tws, 'sog', speed, 'twa', math.degrees(twa), 'brg',
-            # math.degrees(brg), 'rpd', rpd)
+            # math.degrees(brg), 'rpd', rpd)tox
+
             return rpd
 
-        return self._calculate_isochrones(t, dt, isocrone, nextwp, point_f)
+        return self._calculate_isochrones(
+            t, dt, isocrone, nextwp, point_f, self.get_param_value("subdiv")
+        )
 
     def _filter_validity(self, isonew, last):  # noqa: C901
         def valid_point(a):
@@ -232,14 +264,16 @@ class Router:
 
         return isonew
 
-    def _calculate_isochrones_concurrent(self, t, dt, isocrone, nextwp, point_f):
-        """Calcuates isochrones based on point_f next point calculation"""
+    def _calculate_isochrones(  # noqa: C901
+        self, t, dt, isocrone, nextwp, point_f, subdiv
+    ):
+        """Calcuates isochrones based on pointF next point calculation"""
         last = isocrone[-1]
 
         newisopoints = []
 
-        # foreach point of the iso
-        def cisopoints(i):
+        def _calculate_iso_points(i):
+            last = isocrone[-1]
             cisos = []
             p = last[i]
 
@@ -289,91 +323,24 @@ class Router:
 
             return cisos
 
-        executor = ThreadPoolExecutor()
-        for x in executor.map(cisopoints, range(0, len(last))):
-            newisopoints.extend(x)
-
-        executor.shutdown()
-
-        newisopoints = sorted(newisopoints, key=(lambda a: a.start_wp_los[1]))
-
-        # Remove slow isopoints inside
-        bearing = {}
-        for x in newisopoints:
-            k = str(int(math.degrees(x.start_wp_los[1])))
-
-            if k in bearing:
-                if x.next_wp_dist < bearing[k].next_wp_dist:
-                    bearing[k] = x
-            else:
-                bearing[k] = x
-
-        isonew = self._filter_validity(list(bearing.values()), last)
-        isonew = sorted(isonew, key=(lambda a: a.start_wp_los[1]))
-        isocrone.append(isonew)
-
-        return isocrone
-
-    def _calculate_isochrones(self, t, dt, isocrone, nextwp, point_f):
-        """Calcuates isochrones based on point_f next point calculation"""
-        last = isocrone[-1]
-
-        newisopoints = []
-
         # foreach point of the iso
-        for i in range(0, len(last)):
-            p = last[i]
 
-            try:
-                (twd, tws) = self.grib.get_wind_at(t, p.pos[0], p.pos[1])
-            except Exception as e:
-                raise RoutingNoWindError() from e
+        if self.get_param_value("concurrent"):
+            executor = ThreadPoolExecutor()
+            for x in executor.map(_calculate_iso_points, range(0, len(last))):
+                newisopoints.extend(x)
 
-            twd = math.radians(twd)
-            tws = utils.ms_to_knots(tws)
-
-            for twa in range(-180, 180, 5):
-                twa = math.radians(twa)
-                brg = utils.reduce360(twd + twa)
-
-                # Calculate next point
-                ptoiso, speed = point_f(p.pos, tws, twa, dt, brg)
-
-                nextwpdist = utils.point_distance(
-                    ptoiso[0], ptoiso[1], nextwp[0], nextwp[1]
-                )
-                startwplos = isocrone[0][0].lossodromic((ptoiso[0], ptoiso[1]))
-
-                if nextwpdist > p.next_wp_dist:
-                    continue
-
-                # if self.point_validity:
-                # 	if not self.point_validity (ptoiso[0], ptoiso[1]):
-                # 		continue
-                # if self.line_validity:
-                # 	if not self.line_validity (ptoiso[0], ptoiso[1], p.pos[0], p.pos[1]):
-                # 		continue
-
-                newisopoints.append(
-                    IsoPoint(
-                        (ptoiso[0], ptoiso[1]),
-                        i,
-                        t,
-                        twd,
-                        tws,
-                        speed,
-                        math.degrees(brg),
-                        nextwpdist,
-                        startwplos,
-                    )
-                )
+            executor.shutdown()
+        else:
+            for i in range(0, len(last)):
+                newisopoints += _calculate_iso_points(i)
 
         newisopoints = sorted(newisopoints, key=(lambda a: a.start_wp_los[1]))
 
         # Remove slow isopoints inside
         bearing = {}
         for x in newisopoints:
-            k = str(int(math.degrees(x.start_wp_los[1])))
+            k = str(int(math.degrees(x.start_wp_los[1]) / subdiv))
 
             if k in bearing:
                 if x.next_wp_dist < bearing[k].next_wp_dist:
@@ -384,6 +351,8 @@ class Router:
         isonew = self._filter_validity(list(bearing.values()), last)
         isonew = sorted(isonew, key=(lambda a: a.start_wp_los[1]))
         isocrone.append(isonew)
+
+        # print(f"Before filtre: {len(newisopoints)}\tAfter filter: {len(isonew)}")
 
         return isocrone
 

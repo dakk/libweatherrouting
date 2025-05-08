@@ -4,15 +4,6 @@ weatherrouting.routers.router
 .. automodule:: weatherrouting.routers.router
 
    
-   
-   
-
-   
-   
-   
-
-   
-   
    .. rubric:: Classes
 
    .. autosummary::
@@ -22,17 +13,9 @@ weatherrouting.routers.router
       RouterParam
       RoutingResult
    
-   
-
-   
-   
    .. rubric:: Exceptions
 
    .. autosummary::
    
       RoutingNoWindError
    
-   
-
-
-

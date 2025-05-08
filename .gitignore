@@ -4,5 +4,5 @@ dist
 *.pyc
 .tox
 coverage.xml
-.coverage
+.coverage*
 *_cache
