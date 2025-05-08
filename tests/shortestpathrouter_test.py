@@ -21,13 +21,13 @@ import weatherrouting
 from weatherrouting.routers.router import IsoPoint
 from weatherrouting.routers.shortestpathrouter import ShortestPathRouter
 
-from .mock_grib import mock_grib
+from .mock_grib import MockGrib
 from .mock_point_validity import mock_point_validity
 
 
 class TestRouting_noIsland(unittest.TestCase):
     def setUp(self):
-        grib = mock_grib(2, 180, 0.1)
+        grib = MockGrib(2, 180, 0.1)
         self.track = [(5, 38), (5.2, 38.2)]
         island_route = mock_point_validity(self.track)
         self.routing_obj = weatherrouting.Routing(
@@ -61,7 +61,7 @@ class TestRouting_noIsland(unittest.TestCase):
 
 class TestRouting_mockIsland_5(unittest.TestCase):
     def setUp(self):
-        grib = mock_grib(2, 180, 0.1)
+        grib = MockGrib(2, 180, 0.1)
         self.track = [(5, 38), (5.2, 38.2)]
         island_route = mock_point_validity(self.track, factor=5)
         self.routing_obj = weatherrouting.Routing(
@@ -87,7 +87,7 @@ class TestRouting_mockIsland_5(unittest.TestCase):
 
 class checkRoute_out_of_scope(unittest.TestCase):
     def setUp(self):
-        grib = mock_grib(
+        grib = MockGrib(
             10,
             270,
             0.5,
@@ -118,7 +118,7 @@ class checkRoute_out_of_scope(unittest.TestCase):
 
 class TestRouting_custom_step(unittest.TestCase):
     def setUp(self):
-        grib = mock_grib(2, 180, 0.1)
+        grib = MockGrib(2, 180, 0.1)
         self.track = [(5, 38), (5.2, 38.2)]
         island_route = mock_point_validity(self.track)
         self.routing_obj = weatherrouting.Routing(

@@ -16,7 +16,7 @@ import datetime
 import random
 
 
-class mock_grib:
+class MockGrib:
     def __init__(self, starttws, starttwd, fuzziness, out_of_scope=None):
         self.starttws = starttws
         self.starttwd = starttwd
