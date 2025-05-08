@@ -4,11 +4,6 @@ weatherrouting.utils
 .. automodule:: weatherrouting.utils
 
    
-   
-   
-
-   
-   
    .. rubric:: Functions
 
    .. autosummary::
@@ -17,6 +12,7 @@ weatherrouting.utils
       km2nm
       lossodromic
       max_reach_distance
+      ms_to_knots
       nm2km
       ortodromic
       ortodromic2
@@ -26,15 +22,3 @@ weatherrouting.utils
       reduce360
       routage_point_distance
    
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
