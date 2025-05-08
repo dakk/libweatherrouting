@@ -116,20 +116,20 @@ class LinearBestIsoRouter(Router):
 
         def generate_path(p):
             nonlocal path
-            nonlocal isoc
+            nonlocal isoc  # noqa: F824
             path.append(p)
             for iso in isoc[::-1][1::]:
-                path.append(iso[path[-1].prevIdx])
+                path.append(iso[path[-1].prev_idx])
             path = path[::-1]
 
-        minDist = 1000000
+        min_dist = 1000000
         isoc = lastlog.isochrones
         for p in isoc[-1]:
-            checkDist = p.pointDistance(end)
-            if checkDist < minDist:
-                minDist = checkDist
-                minP = p
-        generate_path(minP)
+            check_dist = p.point_distance(end)
+            if check_dist < min_dist:
+                min_dist = check_dist
+                min_p = p
+        generate_path(min_p)
 
         return path
 

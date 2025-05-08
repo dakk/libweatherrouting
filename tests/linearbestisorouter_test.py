@@ -14,8 +14,7 @@
 
 # For detail about GNU see <http://www.gnu.org/licenses/>.
 import datetime
-
-# import json
+import json
 import math
 import os
 import time
@@ -60,7 +59,7 @@ class TestRoutingStraigthUpwind(unittest.TestCase):
 
         base_end = [base_start[0] + s0, base_start[1] + s1]
         head = heading(s0, s1)
-        print("TEST UPWIND TWD", head, "step", s0, s1)
+        # print("TEST UPWIND TWD", head, "step", s0, s1)
         pvmodel = MockpointValidity([base_start, base_end])
         routing_obj = weatherrouting.Routing(
             LinearBestIsoRouter,
@@ -68,9 +67,9 @@ class TestRoutingStraigthUpwind(unittest.TestCase):
             [base_start, base_end],
             MockGrib(10, head, 0),
             datetime.datetime.fromisoformat("2021-04-02T12:00:00"),
-            lineValidity=pvmodel.line_validity,
+            line_validity=pvmodel.line_validity,
         )
-        routing_obj.algorithm.setParamValue("subdiv", 2)
+        routing_obj.algorithm.set_param_value("subdiv", 2)
         res = None
         i = 0
 
@@ -79,20 +78,20 @@ class TestRoutingStraigthUpwind(unittest.TestCase):
             res = routing_obj.step()
             i += 1
             ntime = time.time()
-            print(i, ntime - ptime, "\n")
-            print(routing_obj.get_current_best_path(), "\n")
-            ptime = ntime
+            # print(i, ntime - ptime, "\n")
+            # print(routing_obj.get_current_best_path(), "\n")
+            ptime = ntime  # noqa: F841
 
         path_to_end = res.path
         if not base_gjs:
-            base_gjs = weatherrouting.utils.pathAsGeojson(path_to_end)
+            base_gjs = weatherrouting.utils.path_as_geojson(path_to_end)
         else:
-            base_gjs["features"] += weatherrouting.utils.pathAsGeojson(path_to_end)[
+            base_gjs["features"] += weatherrouting.utils.path_as_geojson(path_to_end)[
                 "features"
             ]
-        gjs = json.dumps(base_gjs)
+        gjs = json.dumps(base_gjs)  # noqa: F841
 
-        print(gjs)
+        # print(gjs)
 
 
 class TestRoutingLowWindNoIsland(unittest.TestCase):

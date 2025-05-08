@@ -173,7 +173,7 @@ class Router:
     def set_param_value(self, code, value):
         if code not in self.PARAMS:
             raise Exception(f"Invalid param: {code}")
-        self.PARAMS[code] = value
+        self.PARAMS[code].value = value
 
     def get_param_value(self, code):
         if code not in self.PARAMS:
@@ -194,7 +194,9 @@ class Router:
                 speed,
             )
 
-        return self._calculate_isochrones(t, dt, isocrone, nextwp, point_f, self.get_param_value("subdiv"))
+        return self._calculate_isochrones(
+            t, dt, isocrone, nextwp, point_f, self.get_param_value("subdiv")
+        )
 
     def calculate_isochrones(self, t, dt, isocrone, nextwp):
         """Calculate isochrones depending on routageSpeed from polar"""
@@ -212,7 +214,9 @@ class Router:
 
             return rpd
 
-        return self._calculate_isochrones(t, dt, isocrone, nextwp, point_f, self.get_param_value("subdiv"))
+        return self._calculate_isochrones(
+            t, dt, isocrone, nextwp, point_f, self.get_param_value("subdiv")
+        )
 
     def _filter_validity(self, isonew, last):  # noqa: C901
         def valid_point(a):
@@ -261,14 +265,14 @@ class Router:
         return isonew
 
     def _calculate_isochrones(  # noqa: C901
-        self, t, dt, isocrone, nextwp, pointF, subdiv
+        self, t, dt, isocrone, nextwp, point_f, subdiv
     ):
         """Calcuates isochrones based on pointF next point calculation"""
         last = isocrone[-1]
 
         newisopoints = []
 
-        def _calculateIsoPoints(i):
+        def _calculate_iso_points(i):
             last = isocrone[-1]
             cisos = []
             p = last[i]
@@ -321,22 +325,22 @@ class Router:
 
         # foreach point of the iso
 
-        if self.getParamValue("concurrent"):
+        if self.get_param_value("concurrent"):
             executor = ThreadPoolExecutor()
-            for x in executor.map(_calculateIsoPoints, range(0, len(last))):
+            for x in executor.map(_calculate_iso_points, range(0, len(last))):
                 newisopoints.extend(x)
 
             executor.shutdown()
         else:
             for i in range(0, len(last)):
-                newisopoints += _calculateIsoPoints(i)
+                newisopoints += _calculate_iso_points(i)
 
         newisopoints = sorted(newisopoints, key=(lambda a: a.start_wp_los[1]))
 
         # Remove slow isopoints inside
         bearing = {}
         for x in newisopoints:
-            k = str(int(math.degrees(x.startWPLos[1]) / subdiv))
+            k = str(int(math.degrees(x.start_wp_los[1]) / subdiv))
 
             if k in bearing:
                 if x.next_wp_dist < bearing[k].next_wp_dist:
