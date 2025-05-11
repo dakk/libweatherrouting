@@ -6,3 +6,4 @@ dist
 coverage.xml
 .coverage*
 *_cache
+venv/

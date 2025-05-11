@@ -17,8 +17,12 @@
 import math
 from io import TextIOWrapper
 from typing import Dict, Optional, Tuple
+import re
 
-
+class PolarError(Exception):
+    def __init__(self, message):
+        self.message = message  
+        
 class Polar:
     def __init__(self, polar_path: str, f: Optional[TextIOWrapper] = None):
         """
@@ -29,11 +33,13 @@ class Polar:
         f : File
                 File object for passing an opened file
         """
+        self.validate_polar_file(polar_path)
 
         self.tws = []
         self.twa = []
         self.vmgdict: Dict[Tuple[float, float], Tuple[float, float]] = {}
         self.speed_table = []
+        
 
         if f is None:
             f = open(polar_path, "r")
@@ -189,3 +195,69 @@ class Polar:
             if twa > twadown:
                 twa = twadown
         return twa
+
+
+    @staticmethod
+    def validate_polar_file(filepath):
+        try:
+            with open(filepath, 'r') as f:
+                content = f.read()
+                lines = content.strip().split('\n')
+            
+            if len(lines) == 0:
+                raise PolarError("EMPTY_FILE")
+            
+            # Parse header to get wind speeds
+            header_parts = re.split(r'\s+', lines[0].strip())
+            
+            # Try to parse wind speeds (should be numeric)
+            try:
+                tws = [float(ws) for ws in header_parts[1:]]
+            except ValueError:
+                raise PolarError("WIND_SPEED_NOT_NUMERIC")
+            
+            # Check for increasing wind speeds
+            if not all(tws[i] <= tws[i+1] for i in range(len(tws)-1)):
+                raise PolarError("WIND_SPEEDS_NOT_INCREASING")
+            
+            # Check data rows
+            expected_columns = len(header_parts)
+            for i, line in enumerate(lines[1:], start=1):
+                parts = re.split(r'\s+', line.strip())
+                
+                # Skip empty lines
+                if not parts or (len(parts) == 1 and not parts[0]):
+                    raise PolarError("EMPTY_LINE")
+                
+                # Check number of columns
+                if len(parts) != expected_columns:
+                    raise PolarError("COLUMN_COUNT_MISMATCH")
+                
+                # Check if TWA is in valid range
+                try:
+                    twa = float(parts[0])
+                    if twa < 0 or twa > 180:
+                        raise PolarError("TWA_OUT_OF_RANGE")
+                except ValueError:
+                    raise PolarError("TWA_NOT_NUMERIC")
+                
+                # Check if boat speeds are non-negative
+                for j, speed in enumerate(parts[1:], start=1):
+                    # Skip empty values or specific placeholders
+                    if speed in ['', '-', 'NaN', 'NULL']:
+                        raise PolarError("EMPTY_VALUE")
+                    try:
+                        boat_speed = float(speed)
+                        if boat_speed < 0:
+                            raise PolarError("NEGATIVE_SPEED")
+                    except ValueError:
+                        raise PolarError("SPEED_NOT_NUMERIC")
+            
+            # If we get here, the file is valid
+            return True
+        except PolarError:
+            # Re-raise PolarError exceptions
+            raise
+        except Exception as e:
+            # Wrap other exceptions in PolarError
+            raise PolarError("UNEXPECTED_ERROR", f"Error processing file: {str(e)}")
