@@ -13,7 +13,7 @@
 
 # For detail about GNU see <http://www.gnu.org/licenses/>.
 from .grib import Grib  # noqa: F401
-from .polar import Polar  # noqa: F401
+from .polar import Polar, PolarError  # noqa: F401
 from .routers import *  # noqa: F401, F403
 from .routing import Routing, list_routing_algorithms  # noqa: F401
 from .utils import *  # noqa: F401, F403
