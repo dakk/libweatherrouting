@@ -241,7 +241,7 @@ class Polar:
                 raise PolarError("TWA_NOT_NUMERIC")
 
             # Check if boat speeds are non-negative
-            for j, speed in enumerate(parts[1:], start=1):
+            for speed in parts[1:]:
                 # Skip empty values or specific placeholders
                 if speed in ["", "-", "NaN", "NULL"]:
                     raise PolarError("EMPTY_VALUE")
