@@ -196,38 +196,39 @@ class Polar:
             if twa > twadown:
                 twa = twadown
         return twa
-    # ---- Start validate function ---- 
+
+    # ---- Start validate function ----
     @staticmethod
     def validate_polar_file(filepath):
         """Validates the structure and content of a polar file.
-        
+
         Returns True if valid, raises PolarError with specific message if invalid.
         """
         with open(filepath, "r") as f:
             content = f.read()
         lines = content.strip().split("\n")
-        
+
         # Check for empty file
         if len(lines) == 1 and not lines[0] or not lines[0]:
             raise PolarError("EMPTY_FILE")
 
         # Process header (wind speeds)
         Polar._validate_header(lines[0])
-        
+
         # Check data rows
         header_parts = re.split(r"\s+", lines[0].strip())
         expected_columns = len(header_parts)
-        
-        for i, line in enumerate(lines[1:], start=1):
+
+        for line in lines[1:]:
             Polar._validate_data_row(line, expected_columns)
-                
+
         return True
 
     @staticmethod
     def _validate_header(header_line):
         """Validates the header line containing wind speeds."""
         header_parts = re.split(r"\s+", header_line.strip())
-        
+
         # Try to parse wind speeds (should be numeric)
         try:
             tws = [float(ws) for ws in header_parts[1:]]
@@ -237,7 +238,7 @@ class Polar:
         # Check for increasing wind speeds
         if not all(tws[i] <= tws[i + 1] for i in range(len(tws) - 1)):
             raise PolarError("WIND_SPEEDS_NOT_INCREASING")
-        
+
         return True
 
     @staticmethod
@@ -255,11 +256,11 @@ class Polar:
 
         # Validate TWA
         Polar._validate_twa(parts[0])
-        
+
         # Validate boat speeds
         for speed in parts[1:]:
             Polar._validate_boat_speed(speed)
-        
+
         return True
 
     @staticmethod
@@ -271,7 +272,7 @@ class Polar:
                 raise PolarError("TWA_OUT_OF_RANGE")
         except ValueError:
             raise PolarError("TWA_NOT_NUMERIC")
-        
+
         return True
 
     @staticmethod
@@ -279,13 +280,14 @@ class Polar:
         """Validates a boat speed value."""
         if speed_str in ["", "-", "NaN", "NULL"]:
             raise PolarError("EMPTY_VALUE")
-        
+
         try:
             boat_speed = float(speed_str)
             if boat_speed < 0:
                 raise PolarError("NEGATIVE_SPEED")
         except ValueError:
             raise PolarError("SPEED_NOT_NUMERIC")
-        
+
         return True
-    # ---- End validate function ---- 
+
+    # ---- End validate function ----
