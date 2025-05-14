@@ -22,7 +22,7 @@ from typing import Dict, Optional, Tuple
 
 class PolarError(Exception):
     def __init__(self, message):
-        super().__init__(message)
+        pass
 
 
 class Polar:
@@ -35,7 +35,7 @@ class Polar:
         f : File
                 File object for passing an opened file
         """
-        self.validate_polar_file(polar_path)
+        self.validate_file(polar_path)
 
         self.tws = []
         self.twa = []
@@ -199,7 +199,7 @@ class Polar:
 
     # ---- Start validate function ----
     @staticmethod
-    def validate_polar_file(filepath):
+    def validate_file(filepath):
         """Validates the structure and content of a polar file.
 
         Returns True if valid, raises PolarError with specific message if invalid.
