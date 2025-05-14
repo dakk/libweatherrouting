@@ -196,19 +196,38 @@ class Polar:
             if twa > twadown:
                 twa = twadown
         return twa
-
+    # ---- Start validate function ---- 
     @staticmethod
-    def validate_polar_file(filepath):  # noqa: C901
+    def validate_polar_file(filepath):
+        """Validates the structure and content of a polar file.
+        
+        Returns True if valid, raises PolarError with specific message if invalid.
+        """
         with open(filepath, "r") as f:
             content = f.read()
         lines = content.strip().split("\n")
-        if len(lines) == 1 and not lines[0] or not lines[0]:  # This checks if there's only one empty line
+        
+        # Check for empty file
+        if len(lines) == 1 and not lines[0] or not lines[0]:
             raise PolarError("EMPTY_FILE")
 
-
-        # Parse header to get wind speeds
+        # Process header (wind speeds)
+        Polar._validate_header(lines[0])
+        
+        # Check data rows
         header_parts = re.split(r"\s+", lines[0].strip())
+        expected_columns = len(header_parts)
+        
+        for i, line in enumerate(lines[1:], start=1):
+            Polar._validate_data_row(line, expected_columns)
+                
+        return True
 
+    @staticmethod
+    def _validate_header(header_line):
+        """Validates the header line containing wind speeds."""
+        header_parts = re.split(r"\s+", header_line.strip())
+        
         # Try to parse wind speeds (should be numeric)
         try:
             tws = [float(ws) for ws in header_parts[1:]]
@@ -218,39 +237,55 @@ class Polar:
         # Check for increasing wind speeds
         if not all(tws[i] <= tws[i + 1] for i in range(len(tws) - 1)):
             raise PolarError("WIND_SPEEDS_NOT_INCREASING")
-
-        # Check data rows
-        expected_columns = len(header_parts)
-        for i, line in enumerate(lines[1:], start=1):
-            parts = re.split(r"\s+", line.strip())
-
-            # Skip empty lines
-            if not parts or (len(parts) == 1 and not parts[0]):
-                raise PolarError("EMPTY_LINE")
-
-            # Check number of columns
-            if len(parts) != expected_columns:
-                raise PolarError("COLUMN_COUNT_MISMATCH")
-
-            # Check if TWA is in valid range
-            try:
-                twa = float(parts[0])
-                if twa < 0 or twa > 180:
-                    raise PolarError("TWA_OUT_OF_RANGE")
-            except ValueError:
-                raise PolarError("TWA_NOT_NUMERIC")
-
-            # Check if boat speeds are non-negative
-            for speed in parts[1:]:
-                # Skip empty values or specific placeholders
-                if speed in ["", "-", "NaN", "NULL"]:
-                    raise PolarError("EMPTY_VALUE")
-                try:
-                    boat_speed = float(speed)
-                    if boat_speed < 0:
-                        raise PolarError("NEGATIVE_SPEED")
-                except ValueError:
-                    raise PolarError("SPEED_NOT_NUMERIC")
-
-        # If we get here, the file is valid
+        
         return True
+
+    @staticmethod
+    def _validate_data_row(line, expected_columns):
+        """Validates a single data row in the polar file."""
+        parts = re.split(r"\s+", line.strip())
+
+        # Skip empty lines
+        if not parts or (len(parts) == 1 and not parts[0]):
+            raise PolarError("EMPTY_LINE")
+
+        # Check number of columns
+        if len(parts) != expected_columns:
+            raise PolarError("COLUMN_COUNT_MISMATCH")
+
+        # Validate TWA
+        Polar._validate_twa(parts[0])
+        
+        # Validate boat speeds
+        for speed in parts[1:]:
+            Polar._validate_boat_speed(speed)
+        
+        return True
+
+    @staticmethod
+    def _validate_twa(twa_str):
+        """Validates a TWA (True Wind Angle) value."""
+        try:
+            twa = float(twa_str)
+            if twa < 0 or twa > 180:
+                raise PolarError("TWA_OUT_OF_RANGE")
+        except ValueError:
+            raise PolarError("TWA_NOT_NUMERIC")
+        
+        return True
+
+    @staticmethod
+    def _validate_boat_speed(speed_str):
+        """Validates a boat speed value."""
+        if speed_str in ["", "-", "NaN", "NULL"]:
+            raise PolarError("EMPTY_VALUE")
+        
+        try:
+            boat_speed = float(speed_str)
+            if boat_speed < 0:
+                raise PolarError("NEGATIVE_SPEED")
+        except ValueError:
+            raise PolarError("SPEED_NOT_NUMERIC")
+        
+        return True
+    # ---- End validate function ---- 

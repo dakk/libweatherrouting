@@ -69,7 +69,6 @@ class TestPolar(unittest.TestCase):
         self.assertAlmostEqual(
             self.polar_obj.get_reaching(6.1)[1], 1.3962634015954636, delta=0.001
         )
-    
     # --- Tests for Polar.validate_polar_file ---
     def _create_temp_file_with_content(self, content: str) -> str:
         temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".pol", encoding="utf-8")
