@@ -21,8 +21,7 @@ from typing import Dict, Optional, Tuple
 
 
 class PolarError(Exception):
-    def __init__(self, message):
-        pass
+    pass
 
 
 class Polar:
