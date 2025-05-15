@@ -84,7 +84,7 @@ class TestPolar(unittest.TestCase):
         )
 
     # --- Tests for Polar.validate_file ---
-    def test_validate_file_succeeds_on_valid_file(self):
+    def test_validate_valid_file(self):
         # This should not raise an error for a known valid file
         try:
             weatherrouting.Polar.validate_file(self.valid_file_path)
@@ -93,7 +93,7 @@ class TestPolar(unittest.TestCase):
                 f"validate_polar_file raised PolarError unexpectedly for a valid file: {e}"
             )
 
-    def test_validate_file_empty_file(self):
+    def test_validate_empty_file(self):
         temp_file_path = create_temp_file("", self)
         with self.assertRaisesRegex(weatherrouting.PolarError, "EMPTY_FILE"):
             weatherrouting.Polar.validate_file(temp_file_path)
