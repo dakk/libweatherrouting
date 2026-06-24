@@ -16,6 +16,8 @@
 # For detail about GNU see <http://www.gnu.org/licenses/>.
 import math
 import re
+
+from bisect import bisect_left
 from io import TextIOWrapper
 from typing import Dict, Optional, Tuple
 
@@ -80,28 +82,32 @@ class Polar:
 
         return s
 
-    def get_speed(self, tws: float, twa: float) -> float:  # noqa: C901
+    def get_speed(self, tws: float, twa: float, bisect=True) -> float:  # noqa: C901
         """Returns the speed (in knots) given tws (in knots) and twa (in radians)"""
+        
+        if bisect:
+            tws1, tws2 = self._bounds(self.tws, tws)
+            twa1, twa2 = self._bounds(self.twa, twa)
+        else:
+            tws1 = 0
+            tws2 = 0
 
-        tws1 = 0
-        tws2 = 0
-
-        for k in range(0, len(self.tws)):
-            if tws >= self.tws[k]:
-                tws1 = k
-        for k in range(len(self.tws) - 1, 0, -1):
-            if tws <= self.tws[k]:
-                tws2 = k
-        if tws1 > tws2:  # TWS over table limits
-            tws2 = len(self.tws) - 1
-        twa1 = 0
-        twa2 = 0
-        for k in range(0, len(self.twa)):
-            if twa >= self.twa[k]:
-                twa1 = k
-        for k in range(len(self.twa) - 1, 0, -1):
-            if twa <= self.twa[k]:
-                twa2 = k
+            for k in range(0, len(self.tws)):
+                if tws >= self.tws[k]:
+                    tws1 = k
+            for k in range(len(self.tws) - 1, 0, -1):
+                if tws <= self.tws[k]:
+                    tws2 = k
+            if tws1 > tws2:  # TWS over table limits
+                tws2 = len(self.tws) - 1
+            twa1 = 0
+            twa2 = 0
+            for k in range(0, len(self.twa)):
+                if twa >= self.twa[k]:
+                    twa1 = k
+            for k in range(len(self.twa) - 1, 0, -1):
+                if twa <= self.twa[k]:
+                    twa2 = k
 
         speed1 = self.speed_table[twa1][tws1]
         speed2 = self.speed_table[twa2][tws1]
@@ -195,6 +201,21 @@ class Polar:
             if twa > twadown:
                 twa = twadown
         return twa
+
+    def _bounds(self, values, value):
+        idx = bisect_left(values, value)
+
+        if idx <= 0:
+            return 0, 0
+
+        if idx >= len(values):
+            last = len(values) - 1
+            return last, last
+
+        if values[idx] == value:
+            return idx, idx
+
+        return idx - 1, idx
 
     # ---- Start validate function ----
     @staticmethod
