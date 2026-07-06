@@ -18,9 +18,10 @@ import math
 from typing import Tuple
 
 import latlon
+import pyproj
 
-# from geographiclib.geodesic import Geodesic
-# geod = Geodesic.WGS84
+_GEOD_WGS84 = pyproj.Geod(ellps="WGS84")
+_GEOD_SPHERE = pyproj.Geod(ellps="sphere")
 
 EARTH_RADIUS = 60.0 * 360 / (2 * math.pi)  # nm
 NAUTICAL_MILE_IN_KM = 1.852
@@ -66,15 +67,20 @@ def ortodromic(
 
 
 def lossodromic(
-    lat_a: float, lon_a: float, lat_b: float, lon_b: float
+    lat_a: float, lon_a: float, lat_b: float, lon_b: float, pyproj = True
 ) -> Tuple[float, float]:
     """Returns the lossodromic distance in km between A and B"""
     # g = geod.Inverse(lat_a, lon_a, lat_b, lon_b)
     # return (g['s12'] * 1e-3, math.radians (g['azi1']))
+    if pyproj:
+        heading, _, _ = _GEOD_WGS84.inv(lon_a, lat_a, lon_b, lat_b)
+        _, _, sphere_meters = _GEOD_SPHERE.inv(lon_a, lat_a, lon_b, lat_b)
+        return (sphere_meters / 1000.0, math.radians(heading))
 
-    p1 = latlon.LatLon(latlon.Latitude(lat_a), latlon.Longitude(lon_a))
-    p2 = latlon.LatLon(latlon.Latitude(lat_b), latlon.Longitude(lon_b))
-    return (p1.distance(p2, ellipse="sphere"), math.radians(p1.heading_initial(p2)))
+    else:
+        p1 = latlon.LatLon(latlon.Latitude(lat_a), latlon.Longitude(lon_a))
+        p2 = latlon.LatLon(latlon.Latitude(lat_b), latlon.Longitude(lon_b))
+        return (p1.distance(p2, ellipse="sphere"), math.radians(p1.heading_initial(p2)))
 
 
 def km2nm(d: float) -> float:
@@ -86,12 +92,16 @@ def nm2km(d: float) -> float:
 
 
 def point_distance(
-    lat_a: float, lon_a: float, lat_b: float, lon_b: float, unit: str = "nm"
-) -> float:
+    lat_a: float, lon_a: float, lat_b: float, lon_b: float,
+    unit: str = "nm", pyproj = True) -> float:
     """Returns the distance between two geo points"""
-    p1 = latlon.LatLon(latlon.Latitude(lat_a), latlon.Longitude(lon_a))
-    p2 = latlon.LatLon(latlon.Latitude(lat_b), latlon.Longitude(lon_b))
-    d = p1.distance(p2)
+    if pyproj:
+        _,_,d_m = _GEOD_WGS84.inv(lon_a, lat_a, lon_b, lat_b)
+        d = d_m/1000.0
+    else:
+        p1 = latlon.LatLon(latlon.Latitude(lat_a), latlon.Longitude(lon_a))
+        p2 = latlon.LatLon(latlon.Latitude(lat_b), latlon.Longitude(lon_b))
+        d = p1.distance(p2)
 
     # d = ortodromic(lat_a, lon_a, lat_b, lon_b)[0]
 
@@ -102,19 +112,24 @@ def point_distance(
 
 
 def routage_point_distance(
-    lat_a: float, lon_a: float, distance: float, hdg: float, unit: str = "nm"
-) -> Tuple[float, float]:
+    lat_a: float, lon_a: float, distance: float, hdg: float,
+    unit: str = "nm", pyproj = True) -> Tuple[float, float]:
     """Returns the point from (lat_a, lon_a) to the given (distance, hdg)"""
     if unit == "nm":
         d = nm2km(distance)
     elif unit == "km":
         d = distance
-
+    of = [0.0, 0.0]
     # g = geod.Direct(lat_a, lon_a, math.degrees(hdg), d * 1e3)
     # return (g['lat2'], g['lon2'])
+    if pyproj:
+        hdg_deg = math.degrees(hdg)
+        d_m = d*1000.0
+        of[1], of[0], _ = _GEOD_WGS84.fwd(lon_a, lat_a, hdg_deg, d_m)
+    else:
+        p = latlon.LatLon(latlon.Latitude(lat_a), latlon.Longitude(lon_a))
+        of = p.offset(math.degrees(hdg), d).to_string("D")
 
-    p = latlon.LatLon(latlon.Latitude(lat_a), latlon.Longitude(lon_a))
-    of = p.offset(math.degrees(hdg), d).to_string("D")
     return (float(of[0]), float(of[1]))
 
 

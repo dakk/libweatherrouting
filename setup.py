@@ -22,6 +22,6 @@ setup(
     setup_requires="setuptools",
     author_email="gessadavide@gmail.com",
     packages=["weatherrouting", "weatherrouting.routers"],
-    install_requires=["latlon3"],  # ['geographiclib'],
+    install_requires=["latlon3", 'pyproj'],
     test_suite="tests",
 )
