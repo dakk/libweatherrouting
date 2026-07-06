@@ -19,6 +19,7 @@ import math
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Tuple
+from copy import deepcopy
 
 from .. import utils
 
@@ -63,18 +64,30 @@ class RoutingNoWindError(Exception):
 
 
 class RoutingResult:
-    def __init__(self, time, path=[], isochrones=[], position=None, progress=0):
+    def __init__(
+        self,
+        time = None,
+        path=None,
+        isochrones=None,
+        position=None,
+        progress=0,
+        diagnostics=None,
+    ):
         self.time = time
-        self.path = path
-        self.isochrones = isochrones
+        self.path = [] if path is None else path
+        self.isochrones = [] if isochrones is None else isochrones
         self.position = position
         self.progress = progress
+        self.diagnostics = {} if diagnostics is None else diagnostics
 
     def __str__(self):
         sp = list(map(lambda x: x.to_list(True), self.path))
-        return f"RoutingResult(time={self.time}, path={sp}, progress={self.progress})"
-        # position=%s, self.position,
-
+        return (
+                f"RoutingResult(time={self.time}, "
+                f"path={sp}, "
+                f"progress={self.progress}), "
+                f"diagnostics={self.diagnostics})"
+                )
 
 @dataclass
 class IsoPoint:
@@ -164,6 +177,8 @@ class Router:
         self.line_validity = line_validity
         self.points_validity = points_validity
         self.lines_validity = lines_validity
+        self.params = deepcopy(self.PARAMS)
+        self.last_diagnostics = {}
 
         if self.points_validity:
             self.point_validity = None
@@ -171,14 +186,14 @@ class Router:
             self.line_validity = None
 
     def set_param_value(self, code, value):
-        if code not in self.PARAMS:
+        if code not in self.params:
             raise Exception(f"Invalid param: {code}")
-        self.PARAMS[code].value = value
+        self.params[code].value = value
 
     def get_param_value(self, code):
-        if code not in self.PARAMS:
+        if code not in self.params:
             raise Exception(f"Invalid param: {code}")
-        return self.PARAMS[code].value
+        return self.params[code].value
 
     def calculate_shortest_path_isochrones(self, fixed_speed, t, dt, isocrone, nextwp):
         """Calculates isochrones based on shortest path at fixed speed in knots (motoring);
@@ -218,7 +233,7 @@ class Router:
             t, dt, isocrone, nextwp, point_f, self.get_param_value("subdiv")
         )
 
-    def _filter_validity(self, isonew, last):  # noqa: C901
+    def _filter_validity(self, isonew, last, diagnostics=None):  # noqa: C901
         def valid_point(a):
             if not self.point_validity(a.pos[0], a.pos[1]):
                 return False
@@ -232,18 +247,31 @@ class Router:
             return True
 
         if self.point_validity:
+            before = len(isonew)
             isonew = list(filter(valid_point, isonew))
+            if diagnostics is not None:
+                diagnostics["rejected_point_validity"] += before - len(isonew)
         if self.line_validity:
+            before = len(isonew)
             isonew = list(filter(valid_line, isonew))
+            if diagnostics is not None:
+                diagnostics["rejected_line_validity"] += before - len(isonew)
         if self.points_validity:
+            before = len(isonew)
             pp = list(map(lambda a: a.pos, isonew))
             pv = self.points_validity(pp)
 
             for x in range(len(isonew)):
                 if not pv[x]:
                     isonew[x] = None
+
             isonew = list(filter(lambda a: a is not None, isonew))
+            if diagnostics is not None:
+                diagnostics["rejected_points_validity"] += before - len(isonew)
+
         if self.lines_validity:
+            before = len(isonew)
+
             pp = list(
                 map(
                     lambda a: [
@@ -262,6 +290,9 @@ class Router:
                     isonew[x] = None
             isonew = list(filter(lambda a: a is not None, isonew))
 
+            if diagnostics is not None:
+                diagnostics["rejected_lines_validity"] += before - len(isonew)
+
         return isonew
 
     def _calculate_isochrones(  # noqa: C901
@@ -269,8 +300,20 @@ class Router:
     ):
         """Calcuates isochrones based on pointF next point calculation"""
         last = isocrone[-1]
-
         newisopoints = []
+
+        diagnostics = {
+            "parents": len(last),
+            "generated": 0,
+            "rejected_no_progress": 0,
+            "before_pruning": 0,
+            "after_pruning": 0,
+            "rejected_point_validity": 0,
+            "rejected_line_validity": 0,
+            "rejected_points_validity": 0,
+            "rejected_lines_validity": 0,
+            "frontier_size": 0,
+        }
 
         def _calculate_iso_points(i):
             last = isocrone[-1]
@@ -298,6 +341,7 @@ class Router:
                 startwplos = isocrone[0][0].lossodromic((ptoiso[0], ptoiso[1]))
 
                 if nextwpdist > p.next_wp_dist:
+                    diagnostics["rejected_no_progress"] += 1
                     continue
 
                 # if self.point_validity:
@@ -306,7 +350,7 @@ class Router:
                 # if self.line_validity:
                 # 	if not self.line_validity (ptoiso[0], ptoiso[1], p.pos[0], p.pos[1]):
                 # 		continue
-
+                diagnostics["generated"] += 1
                 cisos.append(
                     IsoPoint(
                         (ptoiso[0], ptoiso[1]),
@@ -336,6 +380,7 @@ class Router:
                 newisopoints += _calculate_iso_points(i)
 
         newisopoints = sorted(newisopoints, key=(lambda a: a.start_wp_los[1]))
+        diagnostics["before_pruning"] = len(newisopoints)
 
         # Remove slow isopoints inside
         bearing = {}
@@ -348,7 +393,10 @@ class Router:
             else:
                 bearing[k] = x
 
-        isonew = self._filter_validity(list(bearing.values()), last)
+        diagnostics["after_pruning"] = len(bearing)
+        isonew = self._filter_validity(list(bearing.values()), last, diagnostics)
+        diagnostics["frontier_size"] = len(isonew)
+        self.last_diagnostics = diagnostics
         isonew = sorted(isonew, key=(lambda a: a.start_wp_los[1]))
         isocrone.append(isonew)
 

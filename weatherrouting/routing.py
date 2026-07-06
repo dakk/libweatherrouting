@@ -154,7 +154,11 @@ class Routing:
         self.path = np
         self.time = res.time
         nlog = RoutingResult(
-            progress=progress, time=res.time, path=self.path, isochrones=res.isochrones
+            progress=progress,
+            time=res.time,
+            path=self.path,
+            isochrones=res.isochrones,
+            diagnostics=res.diagnostics,
         )
 
         self.log.append(nlog)

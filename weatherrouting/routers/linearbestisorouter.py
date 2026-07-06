@@ -109,6 +109,7 @@ class LinearBestIsoRouter(Router):
             path=path,
             position=position,
             isochrones=isoc,
+            diagnostics=self.last_diagnostics,
         )
 
     def get_current_best_path(self, lastlog, end) -> List:  # noqa: C901
