@@ -49,14 +49,28 @@ class TestRoutingNoIsland(unittest.TestCase):
 
         self.assertEqual(i, 3)
         self.assertEqual(not res.path, False)
-
-        path_to_end = res.path + [IsoPoint(self.track[-1])]
         self.assertEqual(
             res.time, datetime.datetime.fromisoformat("2021-04-02 14:00:00")
         )
-        self.assertEqual(
-            len(json.dumps(weatherrouting.utils.path_as_geojson(path_to_end))), 1201
-        )
+
+        path_to_end = res.path + [IsoPoint(self.track[-1])]
+
+        # expected values from commit 32dd6126bd70d6ec71ee901c94fd0c14050f2fbb
+        expected = [
+            (5, 38),
+            (5.152476865788411, 38.02823298314942),
+            (5.1904822898925635, 38.1781983289182),
+            (5.2, 38.2),
+        ]
+        tolerance_nm = 1e-6
+        for point, expected_pos in zip(path_to_end, expected):
+            dist = weatherrouting.utils.point_distance(
+                point.pos[0],
+                point.pos[1],
+                expected_pos[0],
+                expected_pos[1],
+            )
+            self.assertLessEqual(dist, tolerance_nm)
 
 
 class TestRoutingMockIsland5(unittest.TestCase):
